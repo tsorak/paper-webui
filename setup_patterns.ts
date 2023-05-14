@@ -1,11 +1,14 @@
 import setupStreams from "./setup_streams.ts";
 import * as log from "./log.ts";
 
+import { setWorldReady } from "./mc.ts";
+
 export default function setupPatterns(
   mcProcess: ReturnType<typeof setupStreams>
 ) {
   mcProcess.setPatternListener("]: Done (", () => {
-    log.both("SERVER STARTED LUL!");
+    log.both("World Ready.");
+    setWorldReady(true);
 
     //
     mcProcess.sendMcCommand("say Hello World!");

@@ -20,3 +20,6 @@ const MinecraftInstance = new Deno.Command("java", {
 });
 
 export default MinecraftInstance;
+
+export let worldReady = false;
+export const setWorldReady = (value: boolean) => (worldReady = value);
