@@ -1,3 +1,6 @@
+import setupStreams from "./setup_streams.ts";
+import setupPatterns from "./setup_patterns.ts";
+
 const cfg = {
   INIT_MEM: Deno.env.get("INIT_MEM") || "256M",
   MAX_MEM: Deno.env.get("MAX_MEM") || "2G",
@@ -19,7 +22,24 @@ const MinecraftInstance = new Deno.Command("java", {
   cwd: "mc"
 });
 
-export default MinecraftInstance;
+// Initialiser
 
-export let worldReady = false;
-export const setWorldReady = (value: boolean) => (worldReady = value);
+type McSubProcess = ReturnType<typeof initMc>;
+
+function initMc() {
+  const childProcess = MinecraftInstance.spawn();
+  const subP = { childProcess, stopped: false, worldReady: false };
+
+  setupStreams(subP);
+  setupPatterns(subP);
+
+  async function handleExit() {
+    await subP.childProcess.status;
+    subP.stopped = true;
+  }
+  handleExit();
+
+  return subP;
+}
+
+export default initMc as () => McSubProcess;

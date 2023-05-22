@@ -1,5 +1,3 @@
-import * as log from "./log.ts";
-
 type MCLogPattern = string;
 export interface MCLogEvent {
   name: string;
@@ -17,17 +15,8 @@ const MCLogEvents: Map<MCLogPattern, MCLogEvent> = new Map();
 //   }
 // });
 
-const handleMcOutput = (chunk: Uint8Array): void => {
-  const line = parseMcOutput(chunk);
-
-  log.saveRaw(line);
-
+const handleMcOutput = (line: string): void => {
   matchAgainstPattern(line);
-};
-
-const parseMcOutput = (chunk: Uint8Array): string => {
-  const line = new TextDecoder().decode(chunk);
-  return line;
 };
 
 const matchAgainstPattern = (line: string) => {
@@ -38,5 +27,12 @@ const matchAgainstPattern = (line: string) => {
   }
 };
 
-export default handleMcOutput;
-export { MCLogEvents };
+function setPatternListener(
+  pattern: string,
+  handler: MCLogEvent["handler"],
+  name = ""
+): void {
+  MCLogEvents.set(pattern, { name, handler });
+}
+
+export { handleMcOutput, MCLogEvents, setPatternListener };

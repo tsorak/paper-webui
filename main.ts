@@ -1,35 +1,48 @@
 import { serve } from "https://deno.land/std@0.159.0/http/server.ts";
 
-import mc, { setWorldReady } from "./mc.ts";
-import * as log from "./log.ts";
-import setupStreams from "./setup_streams.ts";
-import setupPatterns from "./setup_patterns.ts";
+import { mc, rnr } from "./queue.ts";
+import runner from "./runner.ts";
+import httpHandler from "./http.ts";
 
-import webui from "./webui.ts";
-
-async function init_mc() {
-  const childProcess = mc.spawn();
-
-  log.both(`Paper spawned with PID:`, childProcess.pid);
-
-  const mcProcess = setupStreams(childProcess);
-  setupPatterns(mcProcess);
-
-  //wait for mc to exit
-  const processExit = await childProcess.status;
-  log.out("Server stopped");
-  setWorldReady(false);
-  Deno.exit(processExit.code);
-}
-
-function init_http() {
-  const listener = serve(webui, { port: 8080 });
+function initHttp() {
+  const listener = serve(httpHandler, { port: 8080 });
   return listener;
 }
 
+async function readStdin(stream = Deno.stdin.readable) {
+  const reader = stream.getReader();
+  const buf = (await reader.read()).value;
+  reader.releaseLock();
+  if (!buf) {
+    readStdin();
+    return;
+  }
+
+  const str = new TextDecoder().decode(buf);
+  const formatted = str.trim();
+  if (!formatted) {
+    readStdin();
+    return;
+  }
+  if (formatted.startsWith("!")) {
+    rnr.push(formatted);
+  } else {
+    mc.push(formatted);
+  }
+
+  readStdin();
+}
+
+let getCurrentInstance: () =>
+  | ReturnType<ReturnType<typeof runner>>
+  | undefined = () => undefined;
+
 function main() {
-  init_mc();
-  init_http();
+  readStdin();
+  getCurrentInstance = runner();
+  initHttp();
 }
 
 main();
+
+export { getCurrentInstance };

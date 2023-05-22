@@ -1,22 +1,19 @@
-import setupStreams from "./setup_streams.ts";
 import * as log from "./log.ts";
+import initMc from "./mc.ts";
+import { setPatternListener } from "./mc_events.ts";
+import { mc } from "./queue.ts";
 
-import { setWorldReady } from "./mc.ts";
-
-export default function setupPatterns(
-  mcProcess: ReturnType<typeof setupStreams>
-) {
-  mcProcess.setPatternListener("]: Done (", () => {
+export default function setupPatterns(p: ReturnType<typeof initMc>) {
+  setPatternListener("]: Done (", () => {
     log.both("World Ready.");
-    setWorldReady(true);
+    p.worldReady = true;
 
-    //
-    mcProcess.sendMcCommand("say Hello World!");
+    mc.sendCMD("say Hello World!");
   });
 
-  mcProcess.setPatternListener("joined the game", (data) => {
+  setPatternListener("joined the game", (data) => {
     const [name] = data.split("]: ")[1].split(" ");
 
-    mcProcess.sendMcCommand(`say Hello ${name}!`);
+    mc.sendCMD(`say Hello ${name}!`);
   });
 }

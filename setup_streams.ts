@@ -1,56 +1,60 @@
-import { mergeReadableStreams } from "https://deno.land/std@0.187.0/streams/mod.ts";
+import initMc from "./mc.ts";
+import { handleMcOutput } from "./mc_events.ts";
+import { mc } from "./queue.ts";
 
-import handleMcOutput, { MCLogEvent, MCLogEvents } from "./mc_events.ts";
-import * as log from "./log.ts";
+export default function setupStreams(p: ReturnType<typeof initMc>) {
+  //allow attached shell, webui and patternHandlers to read from mc stdout
+  async function readSubprocessStdout() {
+    const loop = () => setTimeout(() => readSubprocessStdout(), 10);
 
-function setPatternListener(
-  pattern: string,
-  handler: MCLogEvent["handler"],
-  name = ""
-): void {
-  MCLogEvents.set(pattern, { name, handler });
-}
-
-export default function setupStreams(process: Deno.ChildProcess): {
-  sendMcCommand: typeof sendMcCommand;
-  setPatternListener: typeof setPatternListener;
-} {
-  const mcProcess = process;
-
-  //allow both attached shell and webui to write to mc stdin
-  const webuiStream = new TransformStream();
-  const inStream = mergeReadableStreams(
-    Deno.stdin.readable,
-    webuiStream.readable
-  );
-  inStream.pipeTo(mcProcess.stdin!);
-
-  //allow both attached shell and webui to read from mc stdout
-  const [stdoutStream, outStream] = mcProcess.stdout.tee();
-  stdoutStream.pipeTo(Deno.stdout.writable, { preventClose: true });
-  async function pipeToPatternHandlers() {
-    for await (const chunk of outStream) {
-      handleMcOutput(chunk);
+    if (p.childProcess.stdout.locked || p.stopped) {
+      loop();
+      return;
     }
+
+    const reader = p.childProcess.stdout!.getReader();
+    const output = (await reader.read()).value;
+    if (output !== undefined) {
+      const str = new TextDecoder().decode(output).trim();
+      pipeToPatternHandlers(str);
+      str.split("\n").forEach((line) => {
+        console.log(`%c>%c ${line}`, "color: #f00", "color: initial");
+      });
+      //   stdout_queue.push(str);
+      //   log.saveRaw(str);
+    }
+
+    reader.releaseLock();
+    loop();
   }
-  pipeToPatternHandlers();
 
-  async function sendMcCommand(cmd: string): Promise<void> {
-    log.out(`WebUI issued: ${cmd}`);
-    log.save(`WebUI issued: ${cmd}`);
+  async function writeSubprocessStdin() {
+    const loop = () => setTimeout(() => writeSubprocessStdin(), 200);
 
-    //
-    const parsedCmd = cmd.replaceAll("\n", " ") + "\n";
+    if (p.stopped || p.childProcess.stdin.locked) {
+      loop();
+      return;
+    }
 
-    const chunk = new TextEncoder().encode(parsedCmd);
-    const writer = webuiStream.writable.getWriter();
+    const msg = mc.pop();
+    if (!msg) {
+      loop();
+      return;
+    }
 
-    await writer.write(chunk);
-    writer.releaseLock();
+    const input = new TextEncoder().encode(msg + "\n");
+
+    const w = p.childProcess.stdin.getWriter();
+    await w.write(input);
+    w.releaseLock();
+
+    loop();
   }
 
-  return {
-    sendMcCommand,
-    setPatternListener
-  };
+  function pipeToPatternHandlers(data: string) {
+    handleMcOutput(data);
+  }
+
+  readSubprocessStdout();
+  writeSubprocessStdin();
 }
