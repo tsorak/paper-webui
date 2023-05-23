@@ -4,6 +4,7 @@ import { setState } from "./state";
 
 import ServerStatus from "./components/ServerStatus";
 import ViewsNav from "./components/ViewsNav";
+import Log from "./components/Log";
 
 const App: Component = () => {
   setTimeout(() => {
@@ -33,8 +34,9 @@ const App: Component = () => {
             <div class="h-full w-44">
               <ViewsNav />
             </div>
-            <div class="flex-grow backdrop:opacity-10">
+            <div class="flex flex-col gap-2 flex-grow backdrop:opacity-10">
               <OsResourceStats />
+              <Log />
             </div>
           </div>
         </div>
