@@ -7,7 +7,7 @@ export default function setupStreams(p: ReturnType<typeof initMc>) {
   async function readSubprocessStdout() {
     const loop = () => setTimeout(() => readSubprocessStdout(), 10);
 
-    if (p.childProcess.stdout.locked || p.stopped) {
+    if (!p.running || p.childProcess.stdout.locked) {
       loop();
       return;
     }
@@ -31,7 +31,7 @@ export default function setupStreams(p: ReturnType<typeof initMc>) {
   async function writeSubprocessStdin() {
     const loop = () => setTimeout(() => writeSubprocessStdin(), 200);
 
-    if (p.stopped || p.childProcess.stdin.locked) {
+    if (!p.running || p.childProcess.stdin.locked) {
       loop();
       return;
     }

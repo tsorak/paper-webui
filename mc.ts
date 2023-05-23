@@ -28,14 +28,14 @@ type McSubProcess = ReturnType<typeof initMc>;
 
 function initMc() {
   const childProcess = MinecraftInstance.spawn();
-  const subP = { childProcess, stopped: false, worldReady: false };
+  const subP = { childProcess, running: true, worldReady: false };
 
   setupStreams(subP);
   setupPatterns(subP);
 
   async function handleExit() {
     await subP.childProcess.status;
-    subP.stopped = true;
+    subP.running = false;
   }
   handleExit();
 

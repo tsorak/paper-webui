@@ -30,7 +30,7 @@ function runner() {
       `color: ${code === 0 ? "#0f0" : "#f00"}`,
       "color: initial"
     );
-    instance!.stopped = true;
+    instance!.running = true;
     instance!.worldReady = false;
   }
 
@@ -44,24 +44,24 @@ function runner() {
     }
     switch (cmd) {
       case "start":
-        if (instance!.stopped === false) break;
+        if (instance?.running === true) break;
         start();
         break;
       case "restart":
-        if (instance!.stopped === false) await stop();
+        if (instance?.running === true) await stop();
         start();
         break;
       case "stop":
-        if (instance!.stopped === false) stop();
+        if (instance?.running === true) stop();
         break;
       case "status":
         console.log(
           `[%crunner%c] Minecraft server is %c${
-            instance!.stopped ? "stopped" : "running"
+            instance?.running ? "running" : "stopped"
           }%c.`,
           "color: #f00",
           "color: initial",
-          `color: ${instance!.stopped ? "#f00" : "#0f0"}`,
+          `color: ${instance?.running ? "#0f0" : "#f00"}`,
           "color: initial"
         );
         break;
