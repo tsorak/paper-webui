@@ -1,6 +1,6 @@
-import { Component, createSignal } from "solid-js";
+import { Component } from "solid-js";
 
-const [view, setView] = createSignal<string>("overview");
+import { useViewContext } from "../viewContext";
 
 const ViewsNav: Component = () => {
   return (
@@ -17,6 +17,8 @@ const ViewLink: Component<{
   href?: string;
 }> = (p) => {
   const { text, href } = p;
+  const { view, setView } = useViewContext();
+
   const isCurrentLocation = () => view() === href;
 
   function handleClick(e: MouseEvent) {
