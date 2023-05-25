@@ -28,10 +28,10 @@ const App: Component = () => {
         <main class="flex-grow bg-gray-200">
           <div class="pt-4 w-full h-full max-w-6xl mx-auto">
             <div class="h-full flex gap-8">
-              <div class="h-full w-44">
+              <div class="h-full w-44 flex-shrink-0">
                 <ViewsNav />
               </div>
-              <div class="flex flex-col gap-2 flex-grow backdrop:opacity-10">
+              <div class="flex flex-col gap-2 flex-grow backdrop:opacity-10 break-all">
                 <OsResourceStats />
                 <Log />
               </div>
