@@ -1,5 +1,7 @@
 import { Component } from "solid-js";
 
+import socket from "./websocket-client/socket";
+
 import Router from "./Router";
 
 import { McContext, useMcContext } from "./state";
@@ -10,6 +12,9 @@ import ViewsNav from "./components/ViewsNav";
 
 const App: Component = () => {
   const { view } = useViewContext();
+
+  const s = socket;
+  s.connect();
 
   return (
     <McContext.Provider value={useMcContext()}>

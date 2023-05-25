@@ -1,18 +1,10 @@
+import handleUpgrade from "./websocket-server/server.ts";
 import webui from "./webui.ts";
 
 export default function httpHandler(req: Request) {
   if (req.headers.get("upgrade") === "websocket") {
-    return handleWebSocket(req);
+    return handleUpgrade(req);
   } else {
     return webui(req);
   }
-}
-
-function handleWebSocket(req: Request) {
-  const { response, socket } = Deno.upgradeWebSocket(req);
-
-  socket.onopen = () => {
-    socket.send("Hello from Deno!");
-  };
-  return response;
 }
