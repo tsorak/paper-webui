@@ -78,7 +78,7 @@ function runner() {
     loop();
   }
 
-  start();
+  //   start();
   runCommands();
 
   const getInstance = () => instance;
