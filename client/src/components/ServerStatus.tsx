@@ -1,4 +1,4 @@
-import { state } from "../state";
+import { useMcContext } from "../state";
 
 export default function ServerStatus() {
   return (
@@ -10,6 +10,7 @@ export default function ServerStatus() {
 }
 
 function StatusDot() {
+  const [state] = useMcContext();
   const status = () => state.mcInstance.status;
 
   const bg = (): string => {
@@ -39,6 +40,7 @@ function StatusDot() {
 }
 
 function StatusText() {
+  const [state] = useMcContext();
   const status = () => state.mcInstance.status;
 
   const text = (): string => {

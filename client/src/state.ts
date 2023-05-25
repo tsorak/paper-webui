@@ -1,13 +1,20 @@
+import { createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-interface State {
+export interface State {
   mcInstance: {
     status: "pending" | "on" | "off";
   };
 }
 
-export const [state, setState] = createStore<State>({
+const store = createStore<State>({
   mcInstance: {
     status: "pending"
   }
 });
+
+const McContext = createContext(store);
+
+const useMcContext = () => useContext(McContext);
+
+export { McContext, useMcContext };
