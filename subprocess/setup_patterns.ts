@@ -1,7 +1,7 @@
-import * as log from "./log.ts";
+import * as log from "../log.ts";
 import initMc from "./mc.ts";
 import { setPatternListener } from "./mc_events.ts";
-import { mc } from "./queue.ts";
+import { mc } from "../queue.ts";
 
 export default function setupPatterns(p: ReturnType<typeof initMc>) {
   setPatternListener("]: Done (", () => {

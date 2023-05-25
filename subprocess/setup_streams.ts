@@ -1,6 +1,6 @@
 import initMc from "./mc.ts";
 import { handleMcOutput } from "./mc_events.ts";
-import { mc } from "./queue.ts";
+import { mc } from "../queue.ts";
 
 export default function setupStreams(p: ReturnType<typeof initMc>) {
   //allow attached shell, webui and patternHandlers to read from mc stdout

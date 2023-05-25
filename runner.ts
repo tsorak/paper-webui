@@ -1,4 +1,4 @@
-import initMc from "./mc.ts";
+import initMc from "./subprocess/mc.ts";
 import { mc, rnr } from "./queue.ts";
 
 function runner() {
