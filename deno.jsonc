@@ -1,0 +1,8 @@
+{
+  "tasks": {
+    "start": "./start.sh"
+  },
+  "exclude": [
+    "client"
+  ]
+}
