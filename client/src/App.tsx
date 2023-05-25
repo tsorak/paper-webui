@@ -1,11 +1,12 @@
 import { Component } from "solid-js";
 
+import Router from "./Router";
+
 import { McContext, useMcContext } from "./state";
 import { ViewContext, useViewContext } from "./viewContext";
 
 import ServerStatus from "./components/ServerStatus";
 import ViewsNav from "./components/ViewsNav";
-import Log from "./components/Log";
 
 const App: Component = () => {
   const { view } = useViewContext();
@@ -31,19 +32,18 @@ const App: Component = () => {
               </div>
             </nav>
           </header>
-          <main class="flex-grow bg-gray-200">
+          <div class="flex-grow bg-gray-200">
             <div class="pt-4 w-full h-full max-w-6xl mx-auto">
               <div class="h-full flex gap-8">
                 <div class="h-full w-44 flex-shrink-0">
                   <ViewsNav />
                 </div>
                 <div class="flex flex-col gap-2 flex-grow backdrop:opacity-10 break-all">
-                  <OsResourceStats />
-                  <Log />
+                  <Router />
                 </div>
               </div>
             </div>
-          </main>
+          </div>
           {/* <footer class="bg-gray-200">xd</footer> */}
         </div>
       </ViewContext.Provider>
@@ -51,12 +51,4 @@ const App: Component = () => {
   );
 };
 
-const OsResourceStats: Component = () => (
-  <div class="os-resource-stats flex h-20 gap-4">
-    <div class="bg-white flex-grow rounded-md" />
-    <div class="bg-white flex-grow rounded-md" />
-    <div class="bg-white flex-grow rounded-md" />
-    <div class="bg-white flex-grow rounded-md" />
-  </div>
-);
 export default App;
