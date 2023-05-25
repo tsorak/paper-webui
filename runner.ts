@@ -30,7 +30,7 @@ function runner() {
       `color: ${code === 0 ? "#0f0" : "#f00"}`,
       "color: initial"
     );
-    instance!.running = true;
+    instance!.running = false;
     instance!.worldReady = false;
   }
 
