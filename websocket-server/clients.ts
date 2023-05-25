@@ -13,4 +13,4 @@ function remove(ws: WS) {
   log(`Remove client ${ws.id}`);
 }
 
-export { clients as map, add, remove };
+export { clients, add, remove };

@@ -24,7 +24,7 @@ const MinecraftInstance = new Deno.Command("java", {
 
 // Initialiser
 
-type McSubProcess = ReturnType<typeof initMc>;
+export type McSubProcess = ReturnType<typeof initMc>;
 
 function initMc() {
   const childProcess = MinecraftInstance.spawn();

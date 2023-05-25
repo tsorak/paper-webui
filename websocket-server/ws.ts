@@ -3,6 +3,9 @@ import * as clients from "./clients.ts";
 import route from "./message_router.ts";
 import { logToDisk } from "./utils/log.ts";
 
+import { getCurrentInstance } from "../main.ts";
+import { emitInstanceStatus } from "./trigger/instance_status.ts";
+
 export interface WS extends WebSocket {
   id: string;
   json: (data: unknown) => void;
@@ -26,6 +29,9 @@ function handleOpen(_e: WebSocketEventMap["open"], ws: WS) {
     type: "connected",
     data: { id: ws.id, timestamp: new Date().toJSON() }
   });
+
+  const { running, worldReady } = getCurrentInstance() ?? {};
+  emitInstanceStatus({ running, worldReady }, ws);
 }
 
 function handleMessage(e: WebSocketEventMap["message"], ws: WS) {
