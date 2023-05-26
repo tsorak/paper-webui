@@ -3,6 +3,7 @@ import { Component } from "solid-js";
 import socket from "./websocket-client/socket";
 
 import Router from "./Router";
+import setupWindowListeners from "./windowListeners";
 
 import { McContext, useMcContext } from "./context/mcContext";
 import { ViewContext, useViewContext } from "./context/viewContext";
@@ -11,6 +12,8 @@ import ServerStatus from "./components/ServerStatus";
 import ViewsNav from "./components/ViewsNav";
 
 const App: Component = () => {
+  setupWindowListeners(window);
+
   const { view } = useViewContext();
 
   const s = socket;
