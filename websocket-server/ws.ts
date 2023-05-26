@@ -25,10 +25,12 @@ function setupWS(socket: WebSocket) {
 function handleOpen(_e: WebSocketEventMap["open"], ws: WS) {
   clients.add(ws);
 
-  ws.json({
+  const connectMessage: msg.Message = {
     type: "connected",
     data: { id: ws.id, timestamp: new Date().toJSON() }
-  });
+  };
+
+  ws.json(connectMessage);
 
   const { running, worldReady } = getCurrentInstance() ?? {};
   emitInstanceStatus({ running, worldReady }, ws);
