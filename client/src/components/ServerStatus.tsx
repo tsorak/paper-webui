@@ -17,9 +17,11 @@ function StatusDot() {
     switch (status()) {
       case "pending":
         return "#ff0";
-      case "on":
+      case "starting":
+        return "#0ff";
+      case "running":
         return "#0f0";
-      case "off":
+      case "stopped":
         return "#f00";
       default:
         return "#555";
@@ -47,9 +49,11 @@ function StatusText() {
     switch (status()) {
       case "pending":
         return "Pending";
-      case "on":
+      case "starting":
+        return "Starting";
+      case "running":
         return "Online";
-      case "off":
+      case "stopped":
         return "Offline";
       default:
         return "error";

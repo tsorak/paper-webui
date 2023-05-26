@@ -4,6 +4,7 @@ import logWS from "./utils/socket_logger";
 
 import handleConnected from "./handlers/handleConnected";
 import handlePong from "./handlers/handlePong";
+import handleInstanceStatus from "./handlers/handleInstanceStatus";
 
 export default function route(message: Message, ws: CS) {
   if (message.type !== "pong") {
@@ -18,5 +19,7 @@ export default function route(message: Message, ws: CS) {
       return handlePong(message, ws);
     case "connected":
       return handleConnected(message, ws);
+    case "instance_status":
+      return handleInstanceStatus(message, ws);
   }
 }

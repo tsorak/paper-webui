@@ -1,9 +1,10 @@
 import { createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
+import { InstanceStatusData } from "../../websocket/message";
 
 export interface State {
   mcInstance: {
-    status: "pending" | "on" | "off";
+    status: InstanceStatusData;
   };
 }
 
