@@ -40,8 +40,8 @@ const App: Component = () => {
               </div>
             </nav>
           </header>
-          <div class="flex-grow bg-gray-200">
-            <div class="pt-4 w-full h-full max-w-6xl mx-auto">
+          <div class="p-3 flex-grow bg-gray-200">
+            <div class="w-full h-full max-w-6xl mx-auto">
               <div class="h-full flex gap-8">
                 <div class="h-full w-44 flex-shrink-0">
                   <ViewsNav />

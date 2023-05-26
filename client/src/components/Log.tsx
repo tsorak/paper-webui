@@ -16,7 +16,7 @@ const Shell: Component = (p) => {
   });
 
   return (
-    <div class="rounded-md bg-white flex-grow mb-4 p-2 leading-none font-mono flex flex-col gap-2">
+    <div class="rounded-md bg-white flex-grow p-2 leading-none font-mono flex flex-col gap-2">
       <div class="flex-grow h-0 overflow-auto" ref={scrollRef}>
         <For each={msgs()} fallback={<p>Loading...</p>}>
           {(msg) => <p class="text-sm">{msg}</p>}
