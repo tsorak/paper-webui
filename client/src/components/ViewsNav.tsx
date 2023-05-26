@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 
-import { useViewContext } from "../viewContext";
+import { useViewContext } from "../context/viewContext";
 
 const ViewsNav: Component = () => {
   return (

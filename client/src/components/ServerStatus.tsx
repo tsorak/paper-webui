@@ -1,4 +1,4 @@
-import { useMcContext } from "../state";
+import { useMcContext } from "../context/mcContext";
 
 export default function ServerStatus() {
   return (

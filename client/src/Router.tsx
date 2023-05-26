@@ -1,6 +1,6 @@
 import { Component, Switch, Match } from "solid-js";
 
-import { useViewContext } from "./viewContext";
+import { useViewContext } from "./context/viewContext";
 import Overview from "./views/Overview";
 
 const Router: Component = () => {

@@ -4,8 +4,8 @@ import socket from "./websocket-client/socket";
 
 import Router from "./Router";
 
-import { McContext, useMcContext } from "./state";
-import { ViewContext, useViewContext } from "./viewContext";
+import { McContext, useMcContext } from "./context/mcContext";
+import { ViewContext, useViewContext } from "./context/viewContext";
 
 import ServerStatus from "./components/ServerStatus";
 import ViewsNav from "./components/ViewsNav";

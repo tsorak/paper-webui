@@ -1,5 +1,5 @@
 import { InstanceStatusData } from "../../../../websocket/message";
-import { useMcContext } from "../../state";
+import { useMcContext } from "../../context/mcContext";
 import { CS } from "../socket";
 import logWS from "../utils/socket_logger";
 
