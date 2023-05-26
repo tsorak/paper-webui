@@ -59,3 +59,7 @@ function handleClose(e: WebSocketEventMap["close"], ws: WS) {
 }
 
 export { setupWS };
+
+export const emit = {
+  instanceStatus: emitInstanceStatus
+};

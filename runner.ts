@@ -1,5 +1,6 @@
 import initMc from "./subprocess/mc.ts";
 import { mc, rnr } from "./queue.ts";
+import * as ws from "./websocket-server/ws.ts";
 
 function runner() {
   let instance: ReturnType<typeof initMc> | undefined;
@@ -11,6 +12,7 @@ function runner() {
     );
     instance = initMc();
     handleExit();
+    ws.emit.instanceStatus({ running: true, worldReady: false });
   }
   async function stop() {
     console.log(
@@ -32,6 +34,7 @@ function runner() {
     );
     instance!.running = false;
     instance!.worldReady = false;
+    ws.emit.instanceStatus({ running: false, worldReady: false });
   }
 
   async function runCommands() {
