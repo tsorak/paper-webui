@@ -9,11 +9,14 @@ function getStatusMessage(o: InstanceStatus): InstanceStatusData {
   if (o.running === false) return "stopped";
   if (o.running === true && o.worldReady === true) return "running";
   if (o.running === true) return "starting";
-  return "pending";
+  return "stopped";
 }
 
-export function emitInstanceStatus(o: InstanceStatus, ws?: WS) {
-  const status = getStatusMessage(o);
+export function emitInstanceStatus(
+  status: InstanceStatusData | InstanceStatus,
+  ws?: WS
+) {
+  status = typeof status === "string" ? status : getStatusMessage(status);
   const msg = { type: "instance_status", data: status } as Message;
 
   if (ws) return ws.json(msg);
