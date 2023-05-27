@@ -8,7 +8,7 @@ import setupWindowListeners from "./windowListeners";
 import { McContext, useMcContext } from "./context/mcContext";
 import { ViewContext, useViewContext } from "./context/viewContext";
 
-import ServerStatus from "./components/ServerStatus";
+import ServerControls from "./components/ServerControls";
 import ViewsNav from "./components/ViewsNav";
 
 const App: Component = () => {
@@ -34,9 +34,7 @@ const App: Component = () => {
                   </p>
                 </div>
                 {/* right */}
-                <div class="flex items-center">
-                  <ServerStatus />
-                </div>
+                <ServerControls />
               </div>
             </nav>
           </header>

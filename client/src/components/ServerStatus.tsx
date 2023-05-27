@@ -2,7 +2,7 @@ import { useMcContext } from "../context/mcContext";
 
 export default function ServerStatus() {
   return (
-    <div class="py-1 px-2 w-24 flex gap-2 rounded-md bg-white text-black">
+    <div class="py-1 px-2 w-24 flex gap-2 bg-white text-black">
       <StatusDot />
       <StatusText />
     </div>
