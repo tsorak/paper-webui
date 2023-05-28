@@ -3,6 +3,7 @@ import * as msg from "../../../websocket/message";
 import { CS } from "./socket";
 import logWS from "./utils/socket_logger";
 import setupPinger from "./utils/pinger";
+import { useMcContext } from "../context/mcContext";
 
 export default function setupHandlers(
   websocket: WebSocket,
@@ -46,6 +47,8 @@ function handleClose(
     logWS(`Attempting to reconnect...`);
     reconnectFn();
   }
+
+  useMcContext()[1]("mcInstance", "status", "pending");
 }
 
 function handleError(e: WebSocketEventMap["error"], socket: CS) {
