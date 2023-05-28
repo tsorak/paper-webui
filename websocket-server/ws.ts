@@ -8,7 +8,7 @@ import { emitInstanceStatus } from "./trigger/instance_status.ts";
 
 export interface WS extends WebSocket {
   id: string;
-  json: (data: unknown) => void; //TODO: data: msg.Message
+  json: (data: msg.Message) => void;
 }
 
 function setupWS(socket: WebSocket) {
@@ -40,7 +40,7 @@ function handleMessage(e: WebSocketEventMap["message"], ws: WS) {
   const message = msg.parse(e.data as string);
   if (!message) {
     logToDisk(`${e.data}`, "logs/invalid_messages.log");
-    return ws.json({ error: "Invalid message" });
+    return ws.json({ type: "error", data: "Invalid message" });
   }
 
   return route(message, ws);

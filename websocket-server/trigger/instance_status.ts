@@ -17,7 +17,10 @@ export function emitInstanceStatus(
   ws?: WS
 ) {
   status = typeof status === "string" ? status : getStatusMessage(status);
-  const msg = { type: "instance_status", data: status } as Message;
+  const msg: Message & { type: "instance_status" } = {
+    type: "instance_status",
+    data: status
+  };
 
   if (ws) return ws.json(msg);
   clients.forEach((ws) => {

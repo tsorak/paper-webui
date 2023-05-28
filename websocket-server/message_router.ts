@@ -11,7 +11,7 @@ export default function route(message: Message, ws: WS) {
   switch (message.type) {
     default:
       log(`Unknown message type: ${message.type}`);
-      return ws.json({ error: "Unknown message type" });
+      return ws.json({ type: "error", data: "Unknown message type" });
     case "ping":
       return handlePing(ws);
     case "runner":
