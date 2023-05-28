@@ -1,11 +1,14 @@
 import { Component } from "solid-js";
 import Log from "../components/Log";
+import Command from "../components/Command";
 
 const Overview: Component = () => {
   return (
     <main class="flex flex-col gap-2 flex-grow backdrop:opacity-10 break-all">
-      <OsResourceStats />
+      {/* <OsResourceStats /> */}
+      {/* <Players /> */}
       <Log />
+      <Command />
     </main>
   );
 };

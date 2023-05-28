@@ -6,7 +6,7 @@ const getLog = async () => {
   return log.split("\n");
 };
 
-const Shell: Component = (p) => {
+const Log: Component = (p) => {
   let scrollRef: HTMLDivElement;
   const [msgs, {}] = createResource(getLog);
 
@@ -16,18 +16,15 @@ const Shell: Component = (p) => {
   });
 
   return (
-    <div class="rounded-md bg-white flex-grow p-2 leading-none font-mono flex flex-col gap-2">
-      <div class="flex-grow h-0 overflow-auto" ref={scrollRef}>
-        <For each={msgs()} fallback={<p>Loading...</p>}>
-          {(msg) => <p class="text-sm">{msg}</p>}
-        </For>
-      </div>
-      <form class="flex">
-        <span>{">"}</span>
-        <input type="text" class="w-full" />
-      </form>
+    <div
+      class="flex-grow h-0 overflow-auto font-mono rounded-md bg-white p-2 leading-none"
+      ref={scrollRef}
+    >
+      <For each={msgs()} fallback={<p>Loading...</p>}>
+        {(msg) => <p class="text-sm">{msg}</p>}
+      </For>
     </div>
   );
 };
 
-export default Shell;
+export default Log;

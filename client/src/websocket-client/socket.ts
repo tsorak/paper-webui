@@ -2,6 +2,7 @@ import { WS } from "../../../websocket-server/ws";
 import setupHandlers from "./handlers";
 
 import * as runner from "./emit/runner";
+import * as mc_cmd from "./emit/mc_cmd";
 
 export interface CS extends WS {
   pinger?: {
@@ -52,5 +53,8 @@ export const emit = {
     start: runner.start,
     restart: runner.restart,
     stop: runner.stop
+  },
+  mc: {
+    command: mc_cmd.command
   }
 };

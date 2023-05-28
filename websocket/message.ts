@@ -22,6 +22,10 @@ export type Message =
   | {
       type: "runner";
       data: RunnerData;
+    }
+  | {
+      type: "mc_cmd";
+      data: McCmdData;
     };
 
 export type PingData = { timestamp: string };
@@ -29,6 +33,7 @@ export type PongData = { timestamp: string };
 export type ConnectedData = { id: string; timestamp: string };
 export type InstanceStatusData = "stopped" | "starting" | "running" | "pending"; //TODO: implement "stopping"
 export type RunnerData = "start" | "stop" | "restart";
+export type McCmdData = string;
 
 function parse(message: string): Message | null {
   try {
