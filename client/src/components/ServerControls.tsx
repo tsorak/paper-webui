@@ -2,6 +2,8 @@ import { Component, createSignal } from "solid-js";
 
 import ServerStatus from "./ServerStatus";
 
+import socket, { emit } from "../websocket-client/socket";
+
 export const [dropped, setDropped] = createSignal(false);
 
 const ServerControls: Component = () => {
@@ -45,13 +47,22 @@ const Dropdown: Component = () => {
         transform: dropped() ? "rotateX(0deg)" : "rotateX(90deg)"
       }}
     >
-      <button class="p-2 hover:bg-sky-100 hover:text-sky-600 rounded-md text-left transition-colors">
+      <button
+        class="p-2 hover:bg-sky-100 hover:text-sky-600 rounded-md text-left transition-colors"
+        onclick={() => emit.runner.start(socket.instance)}
+      >
         Start
       </button>
-      <button class="p-2 hover:bg-sky-100 hover:text-sky-600 rounded-md text-left transition-colors">
+      <button
+        class="p-2 hover:bg-sky-100 hover:text-sky-600 rounded-md text-left transition-colors"
+        onclick={() => emit.runner.restart(socket.instance)}
+      >
         Restart
       </button>
-      <button class="p-2 hover:bg-sky-100 hover:text-sky-600 rounded-md text-left transition-colors">
+      <button
+        class="p-2 hover:bg-sky-100 hover:text-sky-600 rounded-md text-left transition-colors"
+        onclick={() => emit.runner.stop(socket.instance)}
+      >
         Stop
       </button>
     </div>

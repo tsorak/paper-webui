@@ -1,14 +1,20 @@
 export interface Message {
-  type: "ping" | "pong" | "connected" | "instance_status";
+  type: "ping" | "pong" | "connected" | "instance_status" | "runner";
   data: MessageData;
 }
 
-type MessageData = PingData | PongData | ConnectedData | InstanceStatusData;
+type MessageData =
+  | PingData
+  | PongData
+  | ConnectedData
+  | InstanceStatusData
+  | RunnerData;
 
 export type PingData = { timestamp: string };
 export type PongData = never;
 export type ConnectedData = { id: string; timestamp: string };
-export type InstanceStatusData = "stopped" | "starting" | "running" | "pending";
+export type InstanceStatusData = "stopped" | "starting" | "running" | "pending"; //TODO: implement "stopping"
+export type RunnerData = "start" | "stop" | "restart";
 
 function parse(message: string): Message | null {
   try {

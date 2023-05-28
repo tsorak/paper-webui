@@ -8,7 +8,7 @@ import { emitInstanceStatus } from "./trigger/instance_status.ts";
 
 export interface WS extends WebSocket {
   id: string;
-  json: (data: unknown) => void;
+  json: (data: unknown) => void; //TODO: data: msg.Message
 }
 
 function setupWS(socket: WebSocket) {

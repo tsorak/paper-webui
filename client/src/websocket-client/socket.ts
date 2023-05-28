@@ -1,6 +1,8 @@
 import { WS } from "../../../websocket-server/ws";
 import setupHandlers from "./handlers";
 
+import * as runner from "./emit/runner";
+
 export interface CS extends WS {
   pinger?: {
     interval?: NodeJS.Timeout;
@@ -44,3 +46,11 @@ const socket = {
 };
 
 export default socket;
+
+export const emit = {
+  runner: {
+    start: runner.start,
+    restart: runner.restart,
+    stop: runner.stop
+  }
+};
