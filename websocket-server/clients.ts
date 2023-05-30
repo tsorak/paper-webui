@@ -1,10 +1,14 @@
 import { WS } from "./ws.ts";
 import log from "./utils/log.ts";
 
-const clients = new Map<string, WS>();
+type Client = {
+  ws: WS;
+};
+
+const clients = new Map<string, Client>();
 
 function add(ws: WS) {
-  clients.set(ws.id, ws);
+  clients.set(ws.id, { ws });
   log(`Add client ${ws.id}`);
 }
 

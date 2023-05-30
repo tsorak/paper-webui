@@ -23,8 +23,8 @@ export function emitInstanceStatus(
   };
 
   if (ws) return ws.json(msg);
-  clients.forEach((ws) => {
-    ws.json(msg);
+  clients.forEach((client) => {
+    client.ws.json(msg);
   });
 
   return { clientsUpdated: clients.size };
