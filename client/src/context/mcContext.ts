@@ -5,12 +5,14 @@ import { InstanceStatusData } from "../../../websocket/message";
 export interface State {
   mcInstance: {
     status: InstanceStatusData;
+    stdout_lines: string[];
   };
 }
 
 const store = createStore<State>({
   mcInstance: {
-    status: "pending"
+    status: "pending",
+    stdout_lines: []
   }
 });
 

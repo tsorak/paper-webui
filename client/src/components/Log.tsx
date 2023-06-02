@@ -1,4 +1,5 @@
-import { Component, createEffect, createResource, For } from "solid-js";
+import { Component, createEffect, For, onCleanup, onMount } from "solid-js";
+import { useMcContext } from "../context/mcContext";
 
 const getLog = async () => {
   const res = await fetch("/logs/latest.log");
@@ -8,11 +9,29 @@ const getLog = async () => {
 
 const Log: Component = (p) => {
   let scrollRef: HTMLDivElement;
-  const [msgs, {}] = createResource(getLog);
+  const [mc, setMc] = useMcContext();
+  const msgs = () => mc.mcInstance.stdout_lines;
 
+  // autoscroll
   createEffect(() => {
     msgs();
     scrollRef.scrollTop = scrollRef.scrollHeight;
+  });
+  // clean on starting
+  // createEffect(() => {
+  //   if (mc.mcInstance.status === "starting") {
+  //     setMc("mcInstance", "stdout_lines", []);
+  //   }
+  // });
+
+  onMount(() => {
+    getLog().then((log) => {
+      setMc("mcInstance", "stdout_lines", log);
+    });
+  });
+
+  onCleanup(() => {
+    setMc("mcInstance", "stdout_lines", []);
   });
 
   return (
