@@ -5,6 +5,7 @@ import { logToDisk } from "./utils/log.ts";
 
 import { getCurrentInstance } from "../main.ts";
 import { emitInstanceStatus } from "./trigger/instance_status.ts";
+import { emitInstanceStdout } from "./trigger/instance_stdout.ts";
 
 export interface WS extends WebSocket {
   id: string;
@@ -61,5 +62,6 @@ function handleClose(e: WebSocketEventMap["close"], ws: WS) {
 export { setupWS };
 
 export const emit = {
-  instanceStatus: emitInstanceStatus
+  instanceStatus: emitInstanceStatus,
+  instanceStdout: emitInstanceStdout
 };

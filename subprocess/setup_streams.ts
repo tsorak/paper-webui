@@ -1,6 +1,7 @@
 import initMc from "./mc.ts";
 import { handleMcOutput } from "./mc_events.ts";
 import { mc } from "../queue.ts";
+import * as ws from "../websocket-server/ws.ts";
 
 export default function setupStreams(p: ReturnType<typeof initMc>) {
   //allow attached shell, webui and patternHandlers to read from mc stdout
@@ -19,6 +20,7 @@ export default function setupStreams(p: ReturnType<typeof initMc>) {
       pipeToPatternHandlers(str);
       str.split("\n").forEach((line) => {
         console.log(`%c>%c ${line}`, "color: #f00", "color: initial");
+        ws.emit.instanceStdout(line);
       });
       //   stdout_queue.push(str);
       //   log.saveRaw(str);
