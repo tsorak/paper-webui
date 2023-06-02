@@ -38,7 +38,7 @@ const Command: Component = () => {
     <form
       class="flex leading-none bg-white rounded-md p-1"
       onsubmit={handleSubmit}
-      style={{ background: notRunning() ? "#fbfbfbaa" : "none" }}
+      style={{ background: notRunning() ? "#fbfbfbaa" : undefined }}
     >
       <span class="translate-y-[1px] select-none">{">"}</span>
       <input
