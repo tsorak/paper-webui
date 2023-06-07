@@ -6,13 +6,15 @@ export interface State {
   mcInstance: {
     status: InstanceStatusData;
     stdout_lines: string[];
+    players: string[];
   };
 }
 
 const store = createStore<State>({
   mcInstance: {
     status: "pending",
-    stdout_lines: []
+    stdout_lines: [],
+    players: ["Notch", "jeb_", "Dinnerbone"]
   }
 });
 

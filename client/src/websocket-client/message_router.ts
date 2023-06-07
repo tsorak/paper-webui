@@ -6,6 +6,7 @@ import handleConnected from "./handlers/handleConnected";
 import handlePong from "./handlers/handlePong";
 import handleInstanceStatus from "./handlers/handleInstanceStatus";
 import handleInstanceStdout from "./handlers/handleInstanceStdout";
+import handleInstancePlayers from "./handlers/handleInstancePlayers";
 
 export default function route(message: Message, ws: CS) {
   if (message.type !== "pong") {
@@ -24,5 +25,7 @@ export default function route(message: Message, ws: CS) {
       return handleInstanceStatus(message, ws);
     case "instance_stdout":
       return handleInstanceStdout(message, ws);
+    case "instance_players":
+      return handleInstancePlayers(message, ws);
   }
 }
