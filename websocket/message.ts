@@ -30,6 +30,10 @@ export type Message =
   | {
       type: "instance_stdout";
       data: InstanceStdoutData;
+    }
+  | {
+      type: "instance_players";
+      data: InstancePlayerData;
     };
 
 export type PingData = { timestamp: string };
@@ -39,6 +43,7 @@ export type InstanceStatusData = "stopped" | "starting" | "running" | "pending";
 export type RunnerData = "start" | "stop" | "restart";
 export type McCmdData = string;
 export type InstanceStdoutData = string;
+export type InstancePlayerData = string[];
 
 function parse(message: string): Message | null {
   try {

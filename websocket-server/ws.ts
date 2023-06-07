@@ -2,10 +2,12 @@ import * as msg from "../websocket/message.ts";
 import * as clients from "./clients.ts";
 import route from "./message_router.ts";
 import { logToDisk } from "./utils/log.ts";
+import * as players from "../subprocess/players.ts";
 
 import { getCurrentInstance } from "../main.ts";
 import { emitInstanceStatus } from "./trigger/instance_status.ts";
 import { emitInstanceStdout } from "./trigger/instance_stdout.ts";
+import { emitInstancePlayers } from "./trigger/instance_players.ts";
 
 export interface WS extends WebSocket {
   id: string;
@@ -35,6 +37,8 @@ function handleOpen(_e: WebSocketEventMap["open"], ws: WS) {
 
   const { running, worldReady } = getCurrentInstance() ?? {};
   emitInstanceStatus({ running, worldReady }, ws);
+
+  ws.json({ type: "instance_players", data: players.getAll() });
 }
 
 function handleMessage(e: WebSocketEventMap["message"], ws: WS) {
@@ -63,5 +67,6 @@ export { setupWS };
 
 export const emit = {
   instanceStatus: emitInstanceStatus,
-  instanceStdout: emitInstanceStdout
+  instanceStdout: emitInstanceStdout,
+  instancePlayers: emitInstancePlayers
 };
