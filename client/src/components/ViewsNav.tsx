@@ -7,6 +7,7 @@ const ViewsNav: Component = () => {
     <div class="flex flex-col gap-1 bg-white rounded-md p-1 text-gray-500">
       <ViewLink text="Overview" href="overview" />
       <ViewLink text="Logs" href="logs" />
+      <ViewLink text="Versions" href="versions" />
       <ViewLink text="Settings" href="settings" />
     </div>
   );

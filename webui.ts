@@ -3,6 +3,8 @@ import { Hono } from "./deps.ts";
 import { getCurrentInstance } from "./main.ts";
 import { mc } from "./queue.ts";
 
+import * as serverVersions from "./subprocess/mc_version.ts";
+
 const app = new Hono();
 
 app.get("/assets/:filename", (c) => {
@@ -36,6 +38,55 @@ app
     mc.sendCMD(body.command);
 
     return c.json({ message: "OK" }, 200);
+  });
+
+app
+  .get("/version", (c) => {
+    return c.json(["vanilla", "papermc"]);
+  })
+  .post("/version", async (c) => {
+    const { serverType, serverVersion, submitType } = (await c.req.json()) as {
+      serverType?: "" | "vanilla" | "papermc";
+      serverVersion?: string;
+      submitType?: "use" | "download";
+    };
+
+    if (serverType && serverVersion) {
+      console.log(serverType, serverVersion);
+
+      const versions = await serverVersions.getVersions(serverType);
+      const foundVersion = versions.find((v) => v.id === serverVersion);
+
+      if (!foundVersion) return c.json({ error: "Invalid version" }, 400);
+      // console.log(foundVersion?.id, foundVersion?.url);
+
+      let jar: { url: string; name: string };
+      switch (serverType) {
+        case "vanilla":
+          jar = await serverVersions.getVanillaJar(foundVersion.url);
+          break;
+
+        case "papermc":
+          jar = await serverVersions.getPaperJar(foundVersion.url);
+          break;
+      }
+
+      // TODO: download jar,
+      // save using name,
+      // if submitType === "use" then symlink jar,
+      // add restart confirmation to UI
+      // ask weather to create a new world or use existing one?
+
+      console.log(jar);
+
+      return c.json(jar, 202);
+    }
+
+    if (serverType && !submitType) {
+      return c.json(await serverVersions.getVersions(serverType));
+    }
+
+    return c.json({ error: "Invalid request" }, 400);
   });
 
 app.get("/logs", async (c) => {
