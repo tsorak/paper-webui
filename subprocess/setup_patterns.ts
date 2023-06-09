@@ -31,4 +31,10 @@ export default function setupPatterns(p: ReturnType<typeof initMc>) {
 
     ws.emit.instancePlayers(players.getAll());
   });
+
+  setPatternListener("]: Stopping server", () => {
+    players.clear();
+
+    ws.emit.instancePlayers(players.getAll());
+  });
 }

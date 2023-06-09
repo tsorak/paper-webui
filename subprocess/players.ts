@@ -12,4 +12,8 @@ function remove(player: string) {
   onlinePlayers.delete(player);
 }
 
-export { getAll, add, remove };
+function clear() {
+  onlinePlayers.clear();
+}
+
+export { getAll, add, remove, clear };
