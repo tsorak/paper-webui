@@ -12,7 +12,7 @@ const MinecraftInstance = new Deno.Command("java", {
     `-Xmx${cfg.MAX_MEM}`,
     `-Xms${cfg.INIT_MEM}`,
     `-jar`,
-    `../paper.jar`,
+    `../server.jar`,
     `--nogui`,
     `--port`,
     `${cfg.MC_PORT}`

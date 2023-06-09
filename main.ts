@@ -3,6 +3,7 @@ import { serve } from "https://deno.land/std@0.159.0/http/server.ts";
 import { mc, rnr } from "./queue.ts";
 import runner from "./runner.ts";
 import httpHandler from "./http.ts";
+import * as jar_manager from "./subprocess/jar_manager.ts";
 
 function initHttp() {
   const listener = serve(httpHandler, { port: 8080 });
@@ -41,6 +42,7 @@ function main() {
   readStdin();
   getCurrentInstance = runner();
   initHttp();
+  jar_manager.init();
 }
 
 main();

@@ -2,6 +2,7 @@ import { Hono } from "./deps.ts";
 
 import { getCurrentInstance } from "./main.ts";
 import { mc } from "./queue.ts";
+import { handleJarDownload } from "./subprocess/jar_manager.ts";
 
 import * as serverVersions from "./subprocess/mc_version.ts";
 
@@ -40,11 +41,16 @@ app
     return c.json({ message: "OK" }, 200);
   });
 
+// TODO: add patch endpoint for switching between installed jars
 app
   .get("/version", (c) => {
     return c.json(["vanilla", "papermc"]);
   })
   .post("/version", async (c) => {
+    // Usually two requests fire at this endpoint in quick succession.
+    // Both requests fetch the respective serverType version.
+    // Optimise by caching the version list for x amount of time.
+
     const { serverType, serverVersion, submitType } = (await c.req.json()) as {
       serverType?: "" | "vanilla" | "papermc";
       serverVersion?: string;
@@ -71,15 +77,15 @@ app
           break;
       }
 
-      // TODO: download jar,
-      // save using name,
-      // if submitType === "use" then symlink jar,
+      // TODO:
       // add restart confirmation to UI
       // ask weather to create a new world or use existing one?
 
       console.log(jar);
 
-      return c.json(jar, 202);
+      const jarStatus = await handleJarDownload(jar.url, jar.name, submitType);
+
+      return c.json({ message: jarStatus.message, ...jar }, jarStatus.status);
     }
 
     if (serverType && !submitType) {
