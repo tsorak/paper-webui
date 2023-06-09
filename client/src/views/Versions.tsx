@@ -1,9 +1,85 @@
-import { Component, For, createResource, createSignal } from "solid-js";
+import { Component, For, Show, createResource, createSignal } from "solid-js";
 
 type VersionEntry = {
   id: string;
   type: string;
   url: string;
+};
+
+const Versions: Component = () => {
+  return (
+    <main class="flex flex-wrap gap-2">
+      <InstalledJars />
+      <JarDownloadForm />
+    </main>
+  );
+};
+
+const InstalledJars: Component = () => {
+  async function getInstalledServers() {
+    const res = await fetch("/installed_versions");
+    if (!res.ok) return { versions: [], activeJar: "" };
+
+    const data = (await res.json()) as {
+      versions: string[];
+      activeJar: string;
+    };
+    return data;
+  }
+
+  const [installedVersions, mutInstalledVersions] =
+    createResource(getInstalledServers);
+
+  const isCurrentJar = (jarName: string) =>
+    installedVersions().activeJar === jarName;
+
+  const setActiveVersion = async (version: string) => {
+    const res = await fetch("/installed_versions", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ jarName: version })
+    });
+    if (!res.ok) return;
+
+    mutInstalledVersions.mutate((data) => {
+      return { ...data, activeJar: version };
+    });
+  };
+
+  //
+  return (
+    <div class="select-none flex flex-col gap-2 leading-none bg-white p-2 rounded-md flex-grow">
+      <h2 class="text-lg font-semibold">Installed Servers</h2>
+      <div class="border-b" />
+      <ul class="flex flex-col gap-2 break-keep">
+        <For each={installedVersions()?.versions}>
+          {(server) => (
+            <li class="flex justify-between items-center">
+              <p>{server}</p>
+              <Show
+                when={!isCurrentJar(server)}
+                fallback={<span class="text-lime-600 mr-2">(current)</span>}
+              >
+                <div class="flex gap-2 mr-2">
+                  <button
+                    onclick={() => setActiveVersion(server)}
+                    class="p-1 border-b border-neutral-300 hover:border-neutral-200 hover:bg-neutral-200 transition-colors"
+                  >
+                    Use
+                  </button>
+                  <button class="p-1 border-b border-neutral-300 hover:border-neutral-200 hover:bg-neutral-200 transition-colors">
+                    Remove
+                  </button>
+                </div>
+              </Show>
+            </li>
+          )}
+        </For>
+      </ul>
+    </div>
+  );
 };
 
 const getServerTypes = async (): Promise<string[]> => {
@@ -14,7 +90,7 @@ const getServerTypes = async (): Promise<string[]> => {
   return data;
 };
 
-const Versions: Component = () => {
+const JarDownloadForm: Component = () => {
   const [serverTypes] = createResource(getServerTypes);
   const [stableOnly, setStableOnly] = createSignal(true);
   const [serverVersions, setServerVersions] = createSignal<VersionEntry[]>([]);
@@ -82,59 +158,58 @@ const Versions: Component = () => {
   };
 
   return (
-    <main>
-      <form onSubmit={handleSubmit}>
-        <div class="select-none flex flex-col gap-2 leading-none bg-white p-2 rounded-md">
-          <div class="flex gap-2">
-            <select
-              name="server-type"
-              class="text-center bg-transparent border-b-2 border-dashed border-gray-300"
-              onchange={handleServerTypeChange}
-            >
-              <option value="">--Server type--</option>
-              <For each={serverTypes()}>
-                {(type) => <option value={type}>{type}</option>}
-              </For>
-            </select>
-            <select
-              name="server-version"
-              class="bg-transparent border-b-2 border-dashed border-gray-300"
-              disabled={!serverVersions().length}
-            >
-              <option value="">--Server version--</option>
-              <For each={versions()}>
-                {(version) => <option value={version.id}>{version.id}</option>}
-              </For>
-            </select>
-          </div>
-          <div class="flex items-center gap-1">
-            <input
-              type="checkbox"
-              id="stable_only"
-              checked
-              onchange={stableOnlyHandler}
-            />
-            <label for="stable_only">Stable versions only</label>
-          </div>
-          <div class="flex gap-2">
-            <button
-              type="submit"
-              value="download"
-              class="p-1 bg-neutral-200 rounded-sm border border-neutral-400 hover:bg-neutral-100"
-            >
-              Download
-            </button>
-            <button
-              type="submit"
-              value="use"
-              class="p-1 bg-neutral-200 rounded-sm border border-neutral-400 hover:bg-neutral-100"
-            >
-              Use
-            </button>
-          </div>
+    <form onSubmit={handleSubmit} class="flex-grow">
+      <div class="select-none flex flex-col gap-2 leading-none bg-white p-2 rounded-md">
+        <h3 class="text-lg font-semibold">Server Downloader</h3>
+        <div class="flex gap-2">
+          <select
+            name="server-type"
+            class="text-center bg-transparent border-b-2 border-dashed border-gray-300"
+            onchange={handleServerTypeChange}
+          >
+            <option value="">--Server type--</option>
+            <For each={serverTypes()}>
+              {(type) => <option value={type}>{type}</option>}
+            </For>
+          </select>
+          <select
+            name="server-version"
+            class="bg-transparent border-b-2 border-dashed border-gray-300"
+            disabled={!serverVersions().length}
+          >
+            <option value="">--Server version--</option>
+            <For each={versions()}>
+              {(version) => <option value={version.id}>{version.id}</option>}
+            </For>
+          </select>
         </div>
-      </form>
-    </main>
+        <div class="flex items-center gap-1">
+          <input
+            type="checkbox"
+            id="stable_only"
+            checked
+            onchange={stableOnlyHandler}
+          />
+          <label for="stable_only">Stable versions only</label>
+        </div>
+        <div class="flex gap-2">
+          <button
+            type="submit"
+            value="download"
+            class="p-2 rounded-md border border-neutral-300 hover:border-sky-100 hover:bg-sky-100 transition-colors"
+          >
+            Download
+          </button>
+          <button
+            type="submit"
+            value="use"
+            class="p-2 rounded-md border border-neutral-300 hover:border-sky-100 hover:bg-sky-100 transition-colors"
+          >
+            Use
+          </button>
+        </div>
+      </div>
+    </form>
   );
 };
 

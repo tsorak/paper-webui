@@ -41,10 +41,39 @@ async function downloadJar(
 async function setActiveJar(path: string) {
   try {
     await Deno.remove("./server.jar");
+    await Deno.symlink(path, "./server.jar");
+    return true;
   } catch (_) {
     //
   }
-  await Deno.symlink(path, "./server.jar");
+  return false;
 }
 
-export { init, handleJarDownload, setActiveJar };
+async function getInstalledJars() {
+  const jars = [];
+  for await (const dirEntry of Deno.readDir("./jars")) {
+    if (dirEntry.isFile) {
+      jars.push(dirEntry);
+    }
+  }
+  return jars.map((jar) => jar.name);
+}
+
+async function getActiveJarName() {
+  try {
+    const jar = await Deno.realPath("./server.jar");
+    return jar.split("/").pop();
+  } catch (_e) {
+    //
+  }
+
+  return "";
+}
+
+export {
+  init,
+  handleJarDownload,
+  setActiveJar,
+  getInstalledJars,
+  getActiveJarName
+};

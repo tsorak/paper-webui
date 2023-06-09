@@ -2,9 +2,9 @@ import { Hono } from "./deps.ts";
 
 import { getCurrentInstance } from "./main.ts";
 import { mc } from "./queue.ts";
-import { handleJarDownload } from "./subprocess/jar_manager.ts";
 
 import * as serverVersions from "./subprocess/mc_version.ts";
+import * as jar_manager from "./subprocess/jar_manager.ts";
 
 const app = new Hono();
 
@@ -41,7 +41,24 @@ app
     return c.json({ message: "OK" }, 200);
   });
 
-// TODO: add patch endpoint for switching between installed jars
+app
+  .get("/installed_versions", async (c) => {
+    const versions = await jar_manager.getInstalledJars();
+    const activeJar = await jar_manager.getActiveJarName();
+    return c.json({ versions, activeJar });
+  })
+  .put("/installed_versions", async (c) => {
+    const { jarName } = (await c.req.json()) as { jarName: string };
+
+    if (!jarName || !jarName.endsWith(".jar")) {
+      return c.json({ error: "Invalid request" }, 400);
+    }
+
+    const success = await jar_manager.setActiveJar(`./jars/${jarName}`);
+
+    return c.json({ success }, success ? 200 : 400);
+  });
+
 app
   .get("/version", (c) => {
     return c.json(["vanilla", "papermc"]);
@@ -83,7 +100,11 @@ app
 
       console.log(jar);
 
-      const jarStatus = await handleJarDownload(jar.url, jar.name, submitType);
+      const jarStatus = await jar_manager.handleJarDownload(
+        jar.url,
+        jar.name,
+        submitType
+      );
 
       return c.json({ message: jarStatus.message, ...jar }, jarStatus.status);
     }
