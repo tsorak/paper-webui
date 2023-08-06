@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.159.0/http/server.ts";
 
 import { mc, rnr } from "./queue.ts";
 import runner from "./runner.ts";
-import httpHandler from "./http.ts";
+import httpHandler from "./webserver.ts";
 import * as jar_manager from "./subprocess/jar_manager.ts";
 
 function initHttp() {

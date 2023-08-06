@@ -4,5 +4,8 @@
   },
   "exclude": [
     "client"
-  ]
+  ],
+  "imports": {
+    "@/": "./"
+  }
 }
