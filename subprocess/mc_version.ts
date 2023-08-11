@@ -15,7 +15,7 @@ async function getVanillaVersions(): Promise<VersionEntry[]> {
   const versions = v.map((v) => ({
     id: v.id,
     type: v.type,
-    url: v.url
+    url: v.url,
   }));
 
   return versions;
@@ -30,7 +30,7 @@ async function getPaperVersions(): Promise<VersionEntry[]> {
   const sortedVersions = v.reverse().map((v) => ({
     id: v,
     type: "release",
-    url: `${rootURL}versions/${v}/`
+    url: `${rootURL}versions/${v}/`,
   }));
 
   return sortedVersions;
@@ -83,8 +83,20 @@ async function getPaperJar(metaurl: string) {
 
   return {
     url: `${metaurl}builds/${build}/downloads/${jarName}`,
-    name: jarName
+    name: jarName,
   };
+}
+
+async function getActiveVersion(): Promise<string | undefined> {
+  try {
+    const currentServerJar = await Deno.realPath("./server.jar");
+    const currentServerJarName = currentServerJar.split("/").at(-1);
+    const currentVersion = currentServerJarName?.replace(".jar", "");
+
+    return currentVersion;
+  } catch (_) {
+    return undefined;
+  }
 }
 
 export {
@@ -92,5 +104,6 @@ export {
   getPaperVersions,
   getVersions,
   getVanillaJar,
-  getPaperJar
+  getPaperJar,
+  getActiveVersion,
 };

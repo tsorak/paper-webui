@@ -4,6 +4,7 @@ import { mc, rnr } from "./queue.ts";
 import runner from "./runner.ts";
 import httpHandler from "./webserver.ts";
 import * as jar_manager from "./subprocess/jar_manager.ts";
+import * as saves_manifest from "./subprocess/saves_manifest.ts";
 
 function initHttp() {
   const listener = serve(httpHandler, { port: 8080 });
@@ -43,6 +44,7 @@ function main() {
   getCurrentInstance = runner();
   initHttp();
   jar_manager.init();
+  saves_manifest.init();
 }
 
 main();

@@ -2,3 +2,5 @@ mc/
 *.jar
 *.log
 jars/
+.saves_manifest.json
+saves/
