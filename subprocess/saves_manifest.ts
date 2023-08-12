@@ -42,6 +42,8 @@ const add = async (entry: SaveEntry) => {
   )) as SaveEntry[];
 
   manifest.push(entry);
+
+  await jsonfile.writeJson("./.saves_manifest.json", manifest);
 };
 
 const getAll = async (): Promise<SaveEntry[]> => {
