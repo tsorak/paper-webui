@@ -1,4 +1,4 @@
-import * as zip from "zip/mod.ts";
+import * as zip from "@/utils/zip.ts";
 import * as mc_version from "./mc_version.ts";
 import * as saves_manifest from "./saves_manifest.ts";
 
@@ -21,18 +21,11 @@ async function saveCurrent(savename?: string): Promise<boolean> {
 
   if (await saves_manifest.get(savename)) return false;
 
-  const savePath = `./saves/${savename}`;
-  const saveDimensions: string[] = [];
-  for await (const entry of Deno.readDir("./mc")) {
-    if (entry.name.includes("world")) {
-      saveDimensions.push(entry.name);
-    }
-  }
-  if (!saveDimensions.length) return false;
-  await zip.compress(saveDimensions, savePath, { overwrite: true, flags: [] });
+  const savePath = `../saves/${savename}`;
+  await zip.compress(["./", "-i", "world**"], savePath, { workdir: "./mc" });
 
   const currentJar = await mc_version.getActiveVersion();
-  saves_manifest.add({ name: savename, jar: currentJar });
+  await saves_manifest.add({ name: savename, jar: currentJar });
 
   return true;
 }
