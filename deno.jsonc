@@ -7,7 +7,6 @@
   ],
   "imports": {
     "@/": "./",
-    "zip/": "https://deno.land/x/zip@v1.2.5/",
     "jsonfile/": "https://deno.land/x/jsonfile@1.0.0/"
   }
 }
