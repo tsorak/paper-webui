@@ -1,9 +1,11 @@
 import * as log from "../log.ts";
 import initMc from "./mc.ts";
 import { setPatternListener } from "./mc_events.ts";
-import { mc } from "../queue.ts";
+import { mc, rnr } from "../queue.ts";
 import * as ws from "../websocket-server/ws.ts";
 import * as players from "./players.ts";
+import { getCurrentInstance } from "../main.ts";
+import * as world_manager from "./world_manager.ts";
 
 export default function setupPatterns(p: ReturnType<typeof initMc>) {
   setPatternListener("]: Done (", () => {
@@ -36,5 +38,28 @@ export default function setupPatterns(p: ReturnType<typeof initMc>) {
     players.clear();
 
     ws.emit.instancePlayers(players.getAll());
+  });
+
+  setPatternListener("> !echo", (data) => {
+    const [playerName] = data.split("<")[1].split(">");
+    const message = data.split("> !echo ")[1];
+
+    mc.sendCMD(`w ${playerName} ${message}`);
+  });
+
+  setPatternListener(["> !skipworld", "> !sw"], async () => {
+    mc.sendCMD("say Skipping world...");
+    mc.sendCMD("stop");
+    const instance = getCurrentInstance();
+    console.log("Waiting for server to stop...");
+    const _stopped = await instance!.childProcess.status;
+    console.log("Server stopped.");
+
+    console.log("Deleting world...");
+    const deleted = await world_manager.deleteCurrent();
+    console.log("World deleted.");
+    console.log(`Removed ${deleted.length} dimension(s).`);
+
+    rnr.push("start");
   });
 }

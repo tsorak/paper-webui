@@ -30,4 +30,21 @@ async function saveCurrent(savename?: string): Promise<boolean> {
   return true;
 }
 
-export { getSaves, saveCurrent };
+async function deleteCurrent() {
+  const dimensions: string[] = [];
+  for await (const entry of Deno.readDir("./mc")) {
+    if (entry.name.startsWith("world") && entry.isDirectory) {
+      dimensions.push(entry.name);
+    }
+  }
+
+  const deletions: Promise<void>[] = [];
+  dimensions.forEach((dimension) => {
+    const deletion = Deno.remove(`./mc/${dimension}`, { recursive: true });
+    deletions.push(deletion);
+  });
+
+  return await Promise.all(deletions);
+}
+
+export { getSaves, saveCurrent, deleteCurrent };
