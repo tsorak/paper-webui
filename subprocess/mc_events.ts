@@ -19,6 +19,11 @@ const handleMcOutput = (line: string): void => {
   matchAgainstPattern(line);
 };
 
+// function formatLine(line: string): { timestamp: string; user: string; message: string } {
+//   const timestamp = line.split("[")[1].split("]")[0];
+//   const username =
+// }
+
 const matchAgainstPattern = (line: string) => {
   for (const [pattern, event] of MCLogEvents) {
     if (line.includes(pattern)) {
@@ -39,4 +44,13 @@ function setPatternListener(
   }
 }
 
-export { handleMcOutput, MCLogEvents, setPatternListener };
+function removePatternListener(pattern: string): void {
+  MCLogEvents.delete(pattern);
+}
+
+export {
+  handleMcOutput,
+  MCLogEvents,
+  setPatternListener,
+  removePatternListener,
+};

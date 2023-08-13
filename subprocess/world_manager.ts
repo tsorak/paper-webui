@@ -10,7 +10,11 @@ async function getSaves(): Promise<{ name: string; version: string }[]> {
   //TODO: read saves manifest
 }
 
-async function saveCurrent(savename?: string): Promise<boolean> {
+async function saveCurrent(
+  savename?: string
+): Promise<
+  { success: true; savename: string } | { success: false; reason: string }
+> {
   savename ||= new Date()
     .toJSON()
     .split(".")[0]
@@ -19,7 +23,9 @@ async function saveCurrent(savename?: string): Promise<boolean> {
   savename = savename.replaceAll(" ", "_");
   if (!savename.endsWith(".zip")) savename += ".zip";
 
-  if (await saves_manifest.get(savename)) return false;
+  const manifest_entry = await saves_manifest.get(savename);
+  if (manifest_entry && manifest_entry.deleted !== true)
+    return { success: false, reason: "Savename already exists." };
 
   const savePath = `../saves/${savename}`;
   await zip.compress(["./", "-i", "world**"], savePath, { workdir: "./mc" });
@@ -27,7 +33,7 @@ async function saveCurrent(savename?: string): Promise<boolean> {
   const currentJar = await mc_version.getActiveVersion();
   await saves_manifest.add({ name: savename, jar: currentJar });
 
-  return true;
+  return { success: true, savename };
 }
 
 async function deleteCurrent() {
