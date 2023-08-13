@@ -17,8 +17,8 @@ export default function setupPatterns(p: ReturnType<typeof initMc>) {
     ws.emit.instanceStatus({ running: true, worldReady: true });
   });
 
-  setPatternListener("joined the game", (data) => {
-    const [name] = data.split("]: ")[1].split(" ");
+  setPatternListener("logged in with entity", (data) => {
+    const [name] = data.split("]: ")[1].split("[");
 
     mc.sendCMD(`say Hello ${name}!`);
 
@@ -27,7 +27,7 @@ export default function setupPatterns(p: ReturnType<typeof initMc>) {
     ws.emit.instancePlayers(players.getAll());
   });
 
-  setPatternListener("left the game", (data) => {
+  setPatternListener("lost connection:", (data) => {
     const [name] = data.split("]: ")[1].split(" ");
 
     players.remove(name);
