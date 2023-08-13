@@ -28,11 +28,15 @@ const matchAgainstPattern = (line: string) => {
 };
 
 function setPatternListener(
-  pattern: string,
+  pattern: string | string[],
   handler: MCLogEvent["handler"],
   name = ""
 ): void {
-  MCLogEvents.set(pattern, { name, handler });
+  if (Array.isArray(pattern)) {
+    pattern.forEach((p) => setPatternListener(p, handler, name));
+  } else {
+    MCLogEvents.set(pattern, { name, handler });
+  }
 }
 
 export { handleMcOutput, MCLogEvents, setPatternListener };
