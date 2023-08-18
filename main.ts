@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.159.0/http/server.ts";
 
+import build from "@/build.ts";
+
 import { mc, rnr } from "./queue.ts";
 import runner from "./runner.ts";
 import httpHandler from "./webserver.ts";
@@ -39,7 +41,9 @@ let getCurrentInstance: () =>
   | ReturnType<ReturnType<typeof runner>>
   | undefined = () => undefined;
 
-function main() {
+async function main() {
+  await build();
+
   readStdin();
   getCurrentInstance = runner();
   initHttp();
