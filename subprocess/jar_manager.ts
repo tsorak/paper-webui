@@ -41,6 +41,10 @@ async function downloadJar(
 async function setActiveJar(path: string) {
   try {
     await Deno.remove("./server.jar");
+  } catch (_) {
+    //
+  }
+  try {
     await Deno.symlink(path, "./server.jar");
     return true;
   } catch (_) {
@@ -75,5 +79,5 @@ export {
   handleJarDownload,
   setActiveJar,
   getInstalledJars,
-  getActiveJarName
+  getActiveJarName,
 };
