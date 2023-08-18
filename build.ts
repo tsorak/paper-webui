@@ -3,7 +3,7 @@ import { exists } from "fs/mod.ts";
 
 async function build() {
   //   const cleanedLatestLog = cleanLatestLog();
-  //   const clientBuilt = buildClient();
+  const clientBuilt = buildClient();
 
   const faultyDirs = await getFaultyDirs();
 
@@ -15,6 +15,23 @@ async function build() {
   await createMissingDirs(faultyDirs.missingDirs);
 
   await eula();
+
+  return { clientReadyState: clientBuilt };
+}
+
+async function buildClient() {
+  const npmProcess = new Deno.Command("npm", {
+    args: ["install"],
+    cwd: resolve(Deno.cwd(), "client"),
+  }).output();
+
+  async function echoDone() {
+    await npmProcess;
+    console.log("Client dependencies installed.");
+  }
+  echoDone();
+
+  return await npmProcess;
 }
 
 async function getFaultyDirs() {
