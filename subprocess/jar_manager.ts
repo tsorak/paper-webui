@@ -1,4 +1,4 @@
-import { fileExists } from "../utils/fs.ts";
+import { exists } from "fs/mod.ts";
 // import { rnr } from "../queue.ts";
 
 async function init() {
@@ -15,7 +15,7 @@ async function handleJarDownload(
   doneAction: "use" | "download" = "download"
 ): Promise<{ message: string; status: 409 | 202 }> {
   //
-  const jarExists = await fileExists(`./jars/${saveName}`);
+  const jarExists = await exists(`./jars/${saveName}`);
   if (jarExists) return { message: "Jar already exists", status: 409 };
 
   downloadJar(url, saveName, doneAction);
