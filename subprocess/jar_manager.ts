@@ -1,12 +1,14 @@
-import { exists } from "fs/mod.ts";
+import { exists, ensureDir } from "fs/mod.ts";
+import { resolve } from "path/mod.ts";
 // import { rnr } from "../queue.ts";
 
+async function ensureJarDir() {
+  const jarDirPath = resolve(Deno.cwd(), "./jars");
+  await ensureDir(jarDirPath);
+}
+
 async function init() {
-  try {
-    await Deno.mkdir("./jars");
-  } catch (_e) {
-    // Dir exists
-  }
+  await ensureJarDir();
 }
 
 async function handleJarDownload(
