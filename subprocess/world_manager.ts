@@ -1,6 +1,7 @@
 import * as zip from "@/utils/zip.ts";
 import * as mc_version from "./mc_version.ts";
 import * as saves_manifest from "./saves_manifest.ts";
+import { resolve } from "path/resolve.ts";
 
 async function getSaves(): Promise<{ name: string; version: string }[]> {
   const saves: { name: string; jar?: string }[] = [];
@@ -27,8 +28,36 @@ async function saveCurrent(
   if (manifest_entry && manifest_entry.deleted !== true)
     return { success: false, reason: "Savename already exists." };
 
-  const savePath = `../saves/${savename}`;
-  await zip.compress(["./", "-i", "world**"], savePath, { workdir: "./mc" });
+  const savePath = resolve(Deno.cwd(), `./saves/${savename}`);
+  const zipResult = await zip.compress(".", savePath, {
+    workdir: resolve(Deno.cwd(), "./mc"),
+    flags: ["-i", "world**"],
+  });
+  //   const possibleDimensions = ["world", "world_nether", "world_the_end"];
+  //   const dimensions: string[] = [];
+  //   for await (const entry of Deno.readDir(resolve(Deno.cwd(), "./mc"))) {
+  //     if (possibleDimensions.includes(entry.name) && entry.isDirectory) {
+  //       dimensions.push(entry.name);
+  //     }
+  //   }
+  //   const savePath = resolve(Deno.cwd(), `./saves/${savename}`);
+  //   const zipResult = await zip.compress(dimensions, savePath, {
+  //     workdir: resolve(Deno.cwd(), "./mc"),
+  //   });
+
+  if (!zipResult.success) {
+    const stderrOutput = new TextDecoder().decode(
+      new Uint8Array(zipResult.stderr.buffer)
+    );
+    console.log(stderrOutput);
+
+    const stdoutOutput = new TextDecoder().decode(
+      new Uint8Array(zipResult.stdout.buffer)
+    );
+    console.log(stdoutOutput);
+
+    return { success: false, reason: "Compress process failed." };
+  }
 
   const currentJar = await mc_version.getActiveVersion();
   await saves_manifest.add({ name: savename, jar: currentJar });
@@ -38,7 +67,7 @@ async function saveCurrent(
 
 async function deleteCurrent() {
   const dimensions: string[] = [];
-  for await (const entry of Deno.readDir("./mc")) {
+  for await (const entry of Deno.readDir(resolve(Deno.cwd(), "./mc"))) {
     if (entry.name.startsWith("world") && entry.isDirectory) {
       dimensions.push(entry.name);
     }
@@ -46,7 +75,9 @@ async function deleteCurrent() {
 
   const deletions: Promise<void>[] = [];
   dimensions.forEach((dimension) => {
-    const deletion = Deno.remove(`./mc/${dimension}`, { recursive: true });
+    const deletion = Deno.remove(resolve(Deno.cwd(), `./mc/${dimension}`), {
+      recursive: true,
+    });
     deletions.push(deletion);
   });
 

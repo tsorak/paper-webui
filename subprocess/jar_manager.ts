@@ -17,7 +17,7 @@ async function handleJarDownload(
   doneAction: "use" | "download" = "download"
 ): Promise<{ message: string; status: 409 | 202 }> {
   //
-  const jarExists = await exists(`./jars/${saveName}`);
+  const jarExists = await exists(resolve(Deno.cwd(), `./jars/${saveName}`));
   if (jarExists) return { message: "Jar already exists", status: 409 };
 
   downloadJar(url, saveName, doneAction);
@@ -30,9 +30,9 @@ async function downloadJar(
   saveName: string,
   doneAction: "use" | "download" = "download"
 ) {
-  const jar = await fetch(url);
-  const jarBuffer = await jar.arrayBuffer();
-  await Deno.writeFile(`./jars/${saveName}`, new Uint8Array(jarBuffer));
+  const jarResult = await fetch(url);
+  const jarData = new Uint8Array(await jarResult.arrayBuffer());
+  await Deno.writeFile(resolve(Deno.cwd(), `./jars/${saveName}`), jarData);
 
   if (doneAction === "use") {
     setActiveJar(`./jars/${saveName}`);
@@ -41,13 +41,17 @@ async function downloadJar(
 }
 
 async function setActiveJar(path: string) {
+  if (!path) return false;
   try {
-    await Deno.remove("./server.jar");
+    await Deno.remove(resolve(Deno.cwd(), "./server.jar"));
   } catch (_) {
     //
   }
   try {
-    await Deno.symlink(path, "./server.jar");
+    await Deno.symlink(
+      resolve(Deno.cwd(), path),
+      resolve(Deno.cwd(), "./server.jar")
+    );
     return true;
   } catch (_) {
     //
@@ -57,7 +61,7 @@ async function setActiveJar(path: string) {
 
 async function getInstalledJars() {
   const jars = [];
-  for await (const dirEntry of Deno.readDir("./jars")) {
+  for await (const dirEntry of Deno.readDir(resolve(Deno.cwd(), "./jars"))) {
     if (dirEntry.isFile) {
       jars.push(dirEntry);
     }
@@ -67,13 +71,13 @@ async function getInstalledJars() {
 
 async function getActiveJarName() {
   try {
-    const jar = await Deno.realPath("./server.jar");
+    const jar = await Deno.realPath(resolve(Deno.cwd(), "./server.jar"));
     return jar.split("/").pop();
   } catch (_e) {
     //
   }
 
-  return "";
+  return undefined;
 }
 
 export {

@@ -1,3 +1,4 @@
+import { resolve } from "path/mod.ts";
 import * as jsonfile from "jsonfile/mod.ts";
 
 interface SaveEntry {
@@ -8,13 +9,13 @@ interface SaveEntry {
 
 const init = async () => {
   try {
-    const _ = await Deno.stat("./.saves_manifest.json");
+    const _ = await Deno.stat(resolve(Deno.cwd(), "./.saves_manifest.json"));
     reindex();
     return;
   } catch (_) {
     //
   }
-  await jsonfile.writeJson("./.saves_manifest.json", []);
+  await jsonfile.writeJson(resolve(Deno.cwd(), "./.saves_manifest.json"), []);
 
   reindex();
 };
@@ -28,7 +29,7 @@ const init = async () => {
 
 const get = async (savename: string): Promise<SaveEntry | undefined> => {
   const manifest = (await jsonfile.readJson(
-    "./.saves_manifest.json"
+    resolve(Deno.cwd(), "./.saves_manifest.json")
   )) as SaveEntry[];
 
   const entry = manifest.find((entry) => entry.name === savename);
@@ -38,17 +39,20 @@ const get = async (savename: string): Promise<SaveEntry | undefined> => {
 
 const add = async (entry: SaveEntry) => {
   const manifest = (await jsonfile.readJson(
-    "./.saves_manifest.json"
+    resolve(Deno.cwd(), "./.saves_manifest.json")
   )) as SaveEntry[];
 
   manifest.push(entry);
 
-  await jsonfile.writeJson("./.saves_manifest.json", manifest);
+  await jsonfile.writeJson(
+    resolve(Deno.cwd(), "./.saves_manifest.json"),
+    manifest
+  );
 };
 
 const getAll = async (): Promise<SaveEntry[]> => {
   const manifest = (await jsonfile.readJson(
-    "./.saves_manifest.json"
+    resolve(Deno.cwd(), "./.saves_manifest.json")
   )) as SaveEntry[];
 
   return manifest;
@@ -56,11 +60,11 @@ const getAll = async (): Promise<SaveEntry[]> => {
 
 const reindex = async () => {
   const manifest = (await jsonfile.readJson(
-    "./.saves_manifest.json"
+    resolve(Deno.cwd(), "./.saves_manifest.json")
   )) as SaveEntry[];
 
   const currentSaves: string[] = [];
-  for await (const save of Deno.readDir("./saves")) {
+  for await (const save of Deno.readDir(resolve(Deno.cwd(), "./saves"))) {
     currentSaves.push(save.name);
   }
 
@@ -77,7 +81,10 @@ const reindex = async () => {
     }
   });
 
-  await jsonfile.writeJson("./.saves_manifest.json", manifest);
+  await jsonfile.writeJson(
+    resolve(Deno.cwd(), "./.saves_manifest.json"),
+    manifest
+  );
 };
 
 export { get, add, getAll, reindex, init };

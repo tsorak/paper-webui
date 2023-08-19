@@ -1,10 +1,12 @@
 import setupStreams from "./setup_streams.ts";
 import setupPatterns from "./setup_patterns.ts";
 
+import { resolve } from "path/mod.ts";
+
 const cfg = {
   INIT_MEM: Deno.env.get("INIT_MEM") || "256M",
   MAX_MEM: Deno.env.get("MAX_MEM") || "2G",
-  MC_PORT: parseInt(Deno.env.get("MC_PORT") || "25565") || 25565
+  MC_PORT: parseInt(Deno.env.get("MC_PORT") || "25565") || 25565,
 };
 
 const MinecraftInstance = new Deno.Command("java", {
@@ -12,14 +14,14 @@ const MinecraftInstance = new Deno.Command("java", {
     `-Xmx${cfg.MAX_MEM}`,
     `-Xms${cfg.INIT_MEM}`,
     `-jar`,
-    `../server.jar`,
+    `${resolve(Deno.cwd(), "./server.jar")}`,
     `--nogui`,
     `--port`,
-    `${cfg.MC_PORT}`
+    `${cfg.MC_PORT}`,
   ],
   stdout: "piped",
   stdin: "piped",
-  cwd: "mc"
+  cwd: resolve(Deno.cwd(), "./mc"),
 });
 
 // Initialiser

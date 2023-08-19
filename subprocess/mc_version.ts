@@ -1,3 +1,5 @@
+import { resolve } from "path/mod.ts";
+
 export type VersionEntry = {
   id: string;
   type: string;
@@ -89,9 +91,9 @@ async function getPaperJar(metaurl: string) {
 
 async function getActiveVersion(): Promise<string | undefined> {
   try {
-    const currentServerJar = await Deno.realPath("./server.jar");
-    const currentServerJarName = currentServerJar.split("/").at(-1);
-    const currentVersion = currentServerJarName?.replace(".jar", "");
+    const currentJar = await Deno.realPath(resolve(Deno.cwd(), "./server.jar"));
+    const currentJarName = currentJar.split("/").at(-1);
+    const currentVersion = currentJarName?.replace(".jar", "");
 
     return currentVersion;
   } catch (_) {
