@@ -91,6 +91,7 @@ export default function setupPatterns(p: ReturnType<typeof initMc>) {
   });
 
   setPatternListener("> !listsaves", async (msg) => {
+    await saves_manifest.reindex();
     const saves = await saves_manifest.getAll();
 
     const verbose = ["all", "verbose"].includes(

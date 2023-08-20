@@ -1,6 +1,20 @@
 import { resolve } from "path/mod.ts";
 import * as jsonfile from "jsonfile/mod.ts";
 
+async function loadManifest() {
+  return (await jsonfile.readJson(
+    resolve(Deno.cwd(), "./.saves_manifest.json")
+  )) as SaveEntry[];
+}
+
+async function writeManifest(data: SaveEntry[]) {
+  return await jsonfile.writeJson(
+    resolve(Deno.cwd(), "./.saves_manifest.json"),
+    data,
+    { spaces: 2 }
+  );
+}
+
 interface SaveEntry {
   name: string;
   jar?: string;
@@ -15,7 +29,7 @@ const init = async () => {
   } catch (_) {
     //
   }
-  await jsonfile.writeJson(resolve(Deno.cwd(), "./.saves_manifest.json"), []);
+  await writeManifest([]);
 
   reindex();
 };
@@ -28,9 +42,7 @@ const init = async () => {
 // };
 
 const get = async (savename: string): Promise<SaveEntry | undefined> => {
-  const manifest = (await jsonfile.readJson(
-    resolve(Deno.cwd(), "./.saves_manifest.json")
-  )) as SaveEntry[];
+  const manifest = await loadManifest();
 
   const entry = manifest.find((entry) => entry.name === savename);
 
@@ -38,30 +50,20 @@ const get = async (savename: string): Promise<SaveEntry | undefined> => {
 };
 
 const add = async (entry: SaveEntry) => {
-  const manifest = (await jsonfile.readJson(
-    resolve(Deno.cwd(), "./.saves_manifest.json")
-  )) as SaveEntry[];
+  const manifest = await loadManifest();
 
   manifest.push(entry);
 
-  await jsonfile.writeJson(
-    resolve(Deno.cwd(), "./.saves_manifest.json"),
-    manifest
-  );
+  return await writeManifest(manifest);
 };
 
 const getAll = async (): Promise<SaveEntry[]> => {
-  const manifest = (await jsonfile.readJson(
-    resolve(Deno.cwd(), "./.saves_manifest.json")
-  )) as SaveEntry[];
-
+  const manifest = await loadManifest();
   return manifest;
 };
 
 const reindex = async () => {
-  const manifest = (await jsonfile.readJson(
-    resolve(Deno.cwd(), "./.saves_manifest.json")
-  )) as SaveEntry[];
+  const manifest = await loadManifest();
 
   const currentSaves: string[] = [];
   for await (const save of Deno.readDir(resolve(Deno.cwd(), "./saves"))) {
@@ -81,10 +83,7 @@ const reindex = async () => {
     }
   });
 
-  await jsonfile.writeJson(
-    resolve(Deno.cwd(), "./.saves_manifest.json"),
-    manifest
-  );
+  return await writeManifest(manifest);
 };
 
 export { get, add, getAll, reindex, init };
