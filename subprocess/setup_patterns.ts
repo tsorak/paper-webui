@@ -110,4 +110,52 @@ export default function setupPatterns(p: ReturnType<typeof initMc>) {
       }
     });
   });
+
+  setPatternListener("> !loadsave", async (msg) => {
+    await saves_manifest.reindex();
+    const [saveNameRaw, replaceCurrentRaw] =
+      msg.split("> !loadsave ")[1]?.split(" ") ?? [];
+
+    if (!saveNameRaw) {
+      mc.sendCMD(`say Please specify a save name.`);
+      return;
+    }
+
+    const saveName = !saveNameRaw.endsWith(".zip")
+      ? saveNameRaw + ".zip"
+      : saveNameRaw;
+    const replaceCurrent = [
+      "true",
+      "yes",
+      "y",
+      "overwrite",
+      "replace",
+      "-f",
+    ].includes(replaceCurrentRaw?.toLowerCase() ?? "");
+
+    if (!(await saves_manifest.has(saveName))) {
+      mc.sendCMD(`say Save '${saveName}' not found.`);
+      return;
+    }
+
+    // perhaps instead of prompting the user, we save the world temporarily and store it for x-amount-of-time
+    if (!replaceCurrent) {
+      mc.sendCMD(`say There is already a world loaded.`);
+      mc.sendCMD(
+        `say If you wish to keep it, save it first and then rerun the command with "replace" as an argument.`
+      );
+      return;
+    }
+
+    mc.sendCMD(`say Loading save '${saveName}'...`);
+    mc.sendCMD("stop");
+
+    const instance = getCurrentInstance();
+    const _stopped = await instance!.childProcess.status;
+
+    const loadStatus = await world_manager.loadWorld(saveName, replaceCurrent);
+    if (!loadStatus.success) return;
+
+    rnr.push("start");
+  });
 }

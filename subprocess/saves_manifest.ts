@@ -49,6 +49,14 @@ const get = async (savename: string): Promise<SaveEntry | undefined> => {
   return entry;
 };
 
+const has = async (savename: string): Promise<boolean> => {
+  const manifest = await loadManifest();
+
+  const entry = manifest.some((entry) => entry.name === savename);
+
+  return entry;
+};
+
 const add = async (entry: SaveEntry) => {
   const manifest = await loadManifest();
 
@@ -86,7 +94,7 @@ const reindex = async () => {
   return await writeManifest(manifest);
 };
 
-export { get, add, getAll, reindex, init };
+export { get, has, add, getAll, reindex, init };
 
 // TODO: idea with the following commented out code is to keep a stream open to the manifest file
 // could prevent rewriting the whole file every time a save is added

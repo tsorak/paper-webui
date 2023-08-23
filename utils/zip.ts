@@ -28,6 +28,8 @@ async function decompress(archive: string, extractPath = "./") {
       "-d",
       resolve(Deno.cwd(), extractPath),
     ],
+    stdout: "piped",
+    stderr: "piped",
   })
     .spawn()
     .output();

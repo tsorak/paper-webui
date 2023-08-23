@@ -2,6 +2,8 @@ import * as zip from "@/utils/zip.ts";
 import * as mc_version from "./mc_version.ts";
 import * as saves_manifest from "./saves_manifest.ts";
 import { resolve } from "path/resolve.ts";
+import { exists } from "fs/exists.ts";
+import { debugCommandOutput } from "@/utils/process.ts";
 
 async function getSaves(): Promise<{ name: string; version: string }[]> {
   const saves: { name: string; jar?: string }[] = [];
@@ -29,7 +31,7 @@ async function saveCurrent(
     return { success: false, reason: "Savename already exists." };
 
   const savePath = resolve(Deno.cwd(), `./saves/${savename}`);
-  const zipResult = await zip.compress(".", savePath, {
+  const compressResult = await zip.compress(".", savePath, {
     workdir: resolve(Deno.cwd(), "./mc"),
     flags: ["-i", "world**"],
   });
@@ -45,17 +47,8 @@ async function saveCurrent(
   //     workdir: resolve(Deno.cwd(), "./mc"),
   //   });
 
-  if (!zipResult.success) {
-    const stderrOutput = new TextDecoder().decode(
-      new Uint8Array(zipResult.stderr.buffer)
-    );
-    console.log(stderrOutput);
-
-    const stdoutOutput = new TextDecoder().decode(
-      new Uint8Array(zipResult.stdout.buffer)
-    );
-    console.log(stdoutOutput);
-
+  if (!compressResult.success) {
+    debugCommandOutput(compressResult);
     return { success: false, reason: "Compress process failed." };
   }
 
@@ -84,4 +77,33 @@ async function deleteCurrent() {
   return await Promise.all(deletions);
 }
 
-export { getSaves, saveCurrent, deleteCurrent };
+// async function hasCurrentBeenSaved(): Promise<boolean> {}
+
+async function hasActiveWorld(): Promise<boolean> {
+  return await exists(resolve(Deno.cwd(), "./mc/world"));
+}
+
+async function loadWorld(
+  saveName: string,
+  replaceCurrent = false
+): Promise<{ success: true } | { success: false; reason: string }> {
+  if (replaceCurrent) await deleteCurrent();
+
+  if ((await hasActiveWorld()) && !replaceCurrent) {
+    return { success: false, reason: "A world is already loaded." };
+  }
+
+  const decompressResult = await zip.decompress(
+    resolve(Deno.cwd(), `./saves/${saveName}`),
+    resolve(Deno.cwd(), "./mc")
+  );
+
+  if (!decompressResult.success) {
+    debugCommandOutput(decompressResult);
+    return { success: false, reason: "Decompress process failed." };
+  }
+
+  return { success: true };
+}
+
+export { getSaves, saveCurrent, deleteCurrent, hasActiveWorld, loadWorld };
