@@ -1,56 +1,30 @@
-type MCLogPattern = string;
-export interface MCLogEvent {
-  name: string;
-  handler: (message: string) => void;
-}
+import { determineEventType } from "@/subprocess/mc_events/lineParser.ts";
+import * as event_maps from "@/subprocess/mc_events/map.ts";
 
-const MCLogEvents: Map<MCLogPattern, MCLogEvent> = new Map();
-
-// MCLogEvents.set("]: Done (", {
-//   name: "server-started",
-//   handler: (message: string) => {
-//     //send to webui
-//     log.out("SERVER STARTED LUL!");
-//     log.save("SERVER STARTED LUL!\n");
-//   }
-// });
+export {
+  setPlayerCommandListener,
+  removePlayerCommandListener,
+  setServerMessageListener,
+  removeServerMessageListener,
+} from "@/subprocess/mc_events/setPattern.ts";
 
 const handleMcOutput = (line: string): void => {
-  matchAgainstPattern(line);
-};
+  const event = determineEventType(line);
 
-// function formatLine(line: string): { timestamp: string; user: string; message: string } {
-//   const timestamp = line.split("[")[1].split("]")[0];
-//   const username =
-// }
-
-const matchAgainstPattern = (line: string) => {
-  for (const [pattern, event] of MCLogEvents) {
-    if (line.includes(pattern)) {
-      event.handler(line);
+  if (event.type === "player") {
+    if (event.data.command) {
+      const matchedFn = event_maps.playerCommandHandlers.get(
+        event.data.command.commandName
+      );
+      if (matchedFn) return matchedFn(event.data);
+    }
+  } else if (event.type === "server") {
+    for (const [pattern, handler] of event_maps.serverMessageHandlers) {
+      if (line.includes(pattern)) {
+        handler(event.data);
+      }
     }
   }
 };
 
-function setPatternListener(
-  pattern: string | string[],
-  handler: MCLogEvent["handler"],
-  name = ""
-): void {
-  if (Array.isArray(pattern)) {
-    pattern.forEach((p) => setPatternListener(p, handler, name));
-  } else {
-    MCLogEvents.set(pattern, { name, handler });
-  }
-}
-
-function removePatternListener(pattern: string): void {
-  MCLogEvents.delete(pattern);
-}
-
-export {
-  handleMcOutput,
-  MCLogEvents,
-  setPatternListener,
-  removePatternListener,
-};
+export { handleMcOutput };
