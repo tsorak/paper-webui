@@ -1,5 +1,6 @@
 import { resolve } from "path/mod.ts";
 import * as jsonfile from "jsonfile/mod.ts";
+import { exists } from "fs/exists.ts";
 
 async function loadManifest() {
   return (await jsonfile.readJson(
@@ -22,24 +23,13 @@ interface SaveEntry {
 }
 
 const init = async () => {
-  try {
-    const _ = await Deno.stat(resolve(Deno.cwd(), "./.saves_manifest.json"));
-    reindex();
-    return;
-  } catch (_) {
-    //
+  if (await exists(resolve(Deno.cwd(), "./.saves_manifest.json"))) {
+    return await reindex();
   }
+
   await writeManifest([]);
-
-  reindex();
+  return await reindex();
 };
-
-// const init_watcher = async () => {
-//   const watcher = Deno.watchFs("./saves", { recursive: false });
-//   for await (const event of watcher) {
-
-//   }
-// };
 
 const get = async (savename: string): Promise<SaveEntry | undefined> => {
   const manifest = await loadManifest();
