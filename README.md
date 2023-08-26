@@ -17,5 +17,6 @@ Manage a [PaperMC](https://papermc.io/) server through a webui
 - [ ] Ports management
 - [ ] Webui authentication
 - [ ] World management tab
-- [ ] Fix downloaded jars not appearing in downloaded jars list
+- [ ] Fix downloaded jars not appearing in downloaded jars list (fs-watch @/jars, ws emit)
 - [ ] Implement serverMessage patternmatching based on whether the logLine starts with, includes or is an exact match to the phrase.
+- [ ] Improve readability in saves_manifest init with fs/exists

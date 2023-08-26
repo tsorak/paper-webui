@@ -1,10 +1,10 @@
 import build from "@/build.ts";
 
-import { mc, rnr } from "./queue.ts";
-import runner from "./runner.ts";
-import httpHandler from "./webserver.ts";
-import * as jar_manager from "./subprocess/jar_manager.ts";
-import * as saves_manifest from "./subprocess/saves_manifest.ts";
+import { mc, rnr } from "@/src/queue.ts";
+import runner from "@/src/runner.ts";
+import httpHandler from "@/src/webserver.ts";
+import * as jar_manager from "@/src/subprocess/jar_manager.ts";
+import * as saves_manifest from "@/src/subprocess/saves_manifest.ts";
 
 function initHttp() {
   return Deno.serve({ port: 8080 }, httpHandler);
