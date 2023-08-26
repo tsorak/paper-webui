@@ -1,20 +1,26 @@
 import { Hono } from "hono/mod.ts";
+import { resolve } from "path/resolve.ts";
+
+import { debugCommandOutput } from "@/src/utils/process.ts";
 
 import { getCurrentInstance } from "@/main.ts";
 import { mc } from "@/src/queue.ts";
 
 const app = new Hono();
 
-app.get("/assets/:filename", (c) => {
+app.get("/assets/:filename", async (c) => {
   const file = c.req.param("filename");
   if (file.endsWith(".js")) {
     c.res.headers.set("Content-Type", "application/javascript");
   }
-  return c.newResponse(Deno.readFileSync(`./client/dist/assets/${file}`));
+  const fileData = await Deno.readFile(
+    resolve(Deno.cwd(), `./client/dist/assets/`, file)
+  );
+  return c.newResponse(fileData);
 });
 
 app
-  .get("/", (c) => {
+  .get("/", async (c) => {
     const worldReady = getCurrentInstance()?.worldReady ?? false;
 
     if (c.req.headers.get("accept") === "application/json") {
@@ -22,12 +28,20 @@ app
     }
 
     //build SolidJS app
-    new Deno.Command("npm", {
+    const clientBuilt = await new Deno.Command("npm", {
       args: ["run", "build"],
-      cwd: "./client",
-    }).outputSync();
+      cwd: resolve(Deno.cwd(), "./client"),
+      stdout: "piped",
+      stderr: "piped",
+    }).output();
 
-    const html = Deno.readTextFileSync("./client/dist/index.html");
+    if (!clientBuilt.success) {
+      debugCommandOutput(clientBuilt);
+    }
+
+    const html = await Deno.readTextFile(
+      resolve(Deno.cwd(), "./client/dist/index.html")
+    );
     return c.html(html);
   })
   .post("/", async (c) => {
