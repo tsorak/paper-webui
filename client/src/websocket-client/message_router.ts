@@ -1,4 +1,4 @@
-import { Message } from "../../../websocket/message";
+import { Message } from "../websocket/message";
 import { CS } from "./socket";
 import logWS from "./utils/socket_logger";
 

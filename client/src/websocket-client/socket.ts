@@ -1,4 +1,4 @@
-import { WS } from "../../../websocket-server/ws";
+import { WS } from "../../../src/websocket-server/ws";
 import setupHandlers from "./handlers";
 
 import * as runner from "./emit/runner";
@@ -43,7 +43,7 @@ const socket = {
   reconnect: function () {
     this.instance = undefined as unknown as CS;
     this.connect();
-  }
+  },
 };
 
 export default socket;
@@ -52,9 +52,9 @@ export const emit = {
   runner: {
     start: runner.start,
     restart: runner.restart,
-    stop: runner.stop
+    stop: runner.stop,
   },
   mc: {
-    command: mc_cmd.command
-  }
+    command: mc_cmd.command,
+  },
 };

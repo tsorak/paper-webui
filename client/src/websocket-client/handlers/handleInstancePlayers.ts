@@ -1,4 +1,4 @@
-import { Message } from "../../../../websocket/message";
+import { Message } from "../../websocket/message";
 import { useMcContext } from "../../context/mcContext";
 import { CS } from "../socket";
 

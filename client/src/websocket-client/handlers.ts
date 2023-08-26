@@ -1,5 +1,5 @@
 import route from "./message_router";
-import * as msg from "../../../websocket/message";
+import * as msg from "../websocket/message";
 import { CS } from "./socket";
 import logWS from "./utils/socket_logger";
 import setupPinger from "./utils/pinger";
