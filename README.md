@@ -16,3 +16,6 @@ Manage a [PaperMC](https://papermc.io/) server through a webui
 - [ ] Whitelist management
 - [ ] Ports management
 - [ ] Webui authentication
+- [ ] World management tab
+- [ ] Fix downloaded jars not appearing in downloaded jars list
+- [ ] Implement serverMessage patternmatching based on whether the logLine starts with, includes or is an exact match to the phrase.
