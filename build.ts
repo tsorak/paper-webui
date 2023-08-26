@@ -81,7 +81,7 @@ async function createMissingDirs(missingDirs: string[]) {
 
   const dirCreation: Promise<void>[] = [];
   missingDirs.forEach((dir) => {
-    console.log(`Creating '${dir}' directory...`);
+    console.log(`Creating ${Deno.cwd()}/${dir}`);
 
     const creationPromise = Deno.mkdir(toFileUrl(resolve(Deno.cwd(), dir)));
     dirCreation.push(creationPromise);
