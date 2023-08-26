@@ -1,4 +1,4 @@
-import { Hono } from "@/deps.ts";
+import { Hono } from "hono/mod.ts";
 
 import { getCurrentInstance } from "@/main.ts";
 import { mc } from "@/queue.ts";

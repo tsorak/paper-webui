@@ -1,4 +1,4 @@
-import { Hono } from "@/deps.ts";
+import { Hono } from "hono/mod.ts";
 import { getActiveVersion } from "@/subprocess/mc_version.ts";
 
 const app = new Hono();

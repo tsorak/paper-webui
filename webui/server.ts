@@ -1,4 +1,4 @@
-import { Hono } from "@/deps.ts";
+import { Hono } from "hono/mod.ts";
 
 import staticRoute from "./handlers/staticRoute.ts";
 import versionRoute from "./handlers/versionRoute.ts";

@@ -1,4 +1,4 @@
-import { Hono } from "@/deps.ts";
+import { Hono } from "hono/mod.ts";
 
 import * as serverVersions from "@/subprocess/mc_version.ts";
 import * as jar_manager from "@/subprocess/jar_manager.ts";

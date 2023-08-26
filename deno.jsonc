@@ -7,6 +7,7 @@
   ],
   "imports": {
     "@/": "./",
+    "hono/": "https://deno.land/x/hono@v3.1.8/",
     "jsonfile/": "https://deno.land/x/jsonfile@1.0.0/",
     "path/": "https://deno.land/std@0.198.0/path/",
     "fs/": "https://deno.land/std@0.198.0/fs/"
