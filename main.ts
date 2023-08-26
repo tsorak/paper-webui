@@ -1,5 +1,3 @@
-import { serve } from "https://deno.land/std@0.159.0/http/server.ts";
-
 import build from "@/build.ts";
 
 import { mc, rnr } from "./queue.ts";
@@ -9,8 +7,7 @@ import * as jar_manager from "./subprocess/jar_manager.ts";
 import * as saves_manifest from "./subprocess/saves_manifest.ts";
 
 function initHttp() {
-  const listener = serve(httpHandler, { port: 8080 });
-  return listener;
+  return Deno.serve({ port: 8080 }, httpHandler);
 }
 
 async function readStdin(stream = Deno.stdin.readable) {
