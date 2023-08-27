@@ -62,11 +62,11 @@ async function setActiveJar(path: string) {
 async function getInstalledJars() {
   const jars = [];
   for await (const dirEntry of Deno.readDir(resolve(Deno.cwd(), "./jars"))) {
-    if (dirEntry.isFile) {
-      jars.push(dirEntry);
+    if (dirEntry.isFile && dirEntry.name.endsWith(".jar")) {
+      jars.push(dirEntry.name);
     }
   }
-  return jars.map((jar) => jar.name);
+  return jars;
 }
 
 async function getActiveJarName() {
