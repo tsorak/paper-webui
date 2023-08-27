@@ -34,6 +34,10 @@ export type Message =
   | {
       type: "instance_players";
       data: InstancePlayerData;
+    }
+  | {
+      type: "jars_change";
+      data: JarsChangeData;
     };
 
 export type PingData = { timestamp: string };
@@ -44,6 +48,9 @@ export type RunnerData = "start" | "stop" | "restart";
 export type McCmdData = string;
 export type InstanceStdoutData = string;
 export type InstancePlayerData = string[];
+export type JarsChangeData =
+  | { initialState: string[] }
+  | { jarName: string; action: "add" | "delete" };
 
 function parse(message: string): Message | null {
   try {

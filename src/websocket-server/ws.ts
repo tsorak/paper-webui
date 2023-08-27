@@ -8,6 +8,7 @@ import { getCurrentInstance } from "@/main.ts";
 import { emitInstanceStatus } from "@/src/websocket-server/trigger/instance_status.ts";
 import { emitInstanceStdout } from "@/src/websocket-server/trigger/instance_stdout.ts";
 import { emitInstancePlayers } from "@/src/websocket-server/trigger/instance_players.ts";
+import "@/src/websocket-server/trigger/jars_trigger.ts";
 
 export interface WS extends WebSocket {
   id: string;
