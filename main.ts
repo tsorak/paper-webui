@@ -5,6 +5,7 @@ import runner from "@/src/runner.ts";
 import httpHandler from "@/src/webserver.ts";
 import * as jar_manager from "@/src/subprocess/jar_manager.ts";
 import * as saves_manifest from "@/src/subprocess/saves_manifest.ts";
+import * as fs_watcher from "@/src/fs-watcher.ts";
 
 function initHttp() {
   return Deno.serve({ port: 8080 }, httpHandler);
@@ -46,6 +47,8 @@ async function main() {
   initHttp();
   jar_manager.init();
   saves_manifest.init();
+
+  fs_watcher.initJarsWatcher();
 }
 
 main();
