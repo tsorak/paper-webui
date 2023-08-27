@@ -8,6 +8,10 @@ export interface State {
     stdout_lines: string[];
     players: string[];
   };
+  jars: {
+    installed: Set<string>;
+    activeJar?: string;
+  };
 }
 
 const store = createStore<State>({
@@ -15,6 +19,10 @@ const store = createStore<State>({
     status: "pending",
     stdout_lines: [],
     players: ["Notch", "jeb_", "Dinnerbone"],
+  },
+  jars: {
+    installed: new Set(),
+    activeJar: undefined,
   },
 });
 

@@ -7,6 +7,7 @@ import handlePong from "./handlers/handlePong";
 import handleInstanceStatus from "./handlers/handleInstanceStatus";
 import handleInstanceStdout from "./handlers/handleInstanceStdout";
 import handleInstancePlayers from "./handlers/handleInstancePlayers";
+import handleJarsChange from "./handlers/handleJarsChange";
 
 export default function route(message: Message, ws: CS) {
   if (message.type !== "pong") {
@@ -27,5 +28,7 @@ export default function route(message: Message, ws: CS) {
       return handleInstanceStdout(message, ws);
     case "instance_players":
       return handleInstancePlayers(message, ws);
+    case "jars_change":
+      return handleJarsChange(message, ws);
   }
 }

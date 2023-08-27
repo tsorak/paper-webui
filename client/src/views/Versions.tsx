@@ -1,4 +1,13 @@
-import { Component, For, Show, createResource, createSignal } from "solid-js";
+import {
+  Component,
+  For,
+  Show,
+  createEffect,
+  createResource,
+  createSignal,
+} from "solid-js";
+
+import { useMcContext } from "../context/mcContext";
 
 type VersionEntry = {
   id: string;
@@ -16,6 +25,10 @@ const Versions: Component = () => {
 };
 
 const InstalledJars: Component = () => {
+  const [mcContext, mutMcContext] = useMcContext();
+  const installedVersions = () => mcContext.jars.installed;
+  const activeJar = () => mcContext.jars.activeJar;
+
   async function getInstalledServers() {
     const res = await fetch("/installed_versions");
     if (!res.ok) return { versions: [], activeJar: "" };
@@ -27,26 +40,35 @@ const InstalledJars: Component = () => {
     return data;
   }
 
-  const [installedVersions, mutInstalledVersions] =
-    createResource(getInstalledServers);
+  const [fetchedVersions] = createResource(getInstalledServers);
 
-  const isCurrentJar = (jarName: string) =>
-    installedVersions().activeJar === jarName;
+  const isCurrentJar = (jarName: string) => activeJar() === jarName;
 
   const setActiveVersion = async (version: string) => {
     const res = await fetch("/installed_versions", {
       method: "PUT",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ jarName: version })
+      body: JSON.stringify({ jarName: version }),
     });
     if (!res.ok) return;
 
-    mutInstalledVersions.mutate((data) => {
-      return { ...data, activeJar: version };
-    });
+    mutMcContext("jars", "activeJar", version);
   };
+
+  createEffect(() => {
+    if (fetchedVersions.state === "ready") {
+      const { versions, activeJar } = fetchedVersions();
+      mutMcContext("jars", "installed", new Set(versions));
+      mutMcContext("jars", "activeJar", activeJar);
+    }
+  });
+
+  //   createEffect(() => {
+  //     console.log("installedVersions", installedVersions());
+  //     console.log("activeJar", activeJar());
+  //   });
 
   //
   return (
@@ -54,9 +76,9 @@ const InstalledJars: Component = () => {
       <h2 class="text-lg font-semibold">Installed Servers</h2>
       <div class="border-b" />
       <ul class="flex flex-col gap-2 break-keep">
-        <For each={installedVersions()?.versions}>
+        <For each={Array.from(installedVersions())}>
           {(server) => (
-            <li class="flex justify-between items-center">
+            <li class="flex justify-between items-center h-6">
               <p>{server}</p>
               <Show
                 when={!isCurrentJar(server)}
@@ -119,9 +141,9 @@ const JarDownloadForm: Component = () => {
     const res = await fetch("/version", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ serverType, serverVersion, submitType })
+      body: JSON.stringify({ serverType, serverVersion, submitType }),
     });
 
     form.reset();
@@ -130,6 +152,9 @@ const JarDownloadForm: Component = () => {
 
     const data = (await res.json()) as { url: string; name: string };
     console.log("Adding jar", data);
+
+    const [_, mutMcContext] = useMcContext();
+    mutMcContext("jars", "activeJar", data.name);
   }
 
   async function handleServerTypeChange(e: Event) {
@@ -142,9 +167,9 @@ const JarDownloadForm: Component = () => {
     const res = await fetch("/version", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ serverType: selectedValue })
+      body: JSON.stringify({ serverType: selectedValue }),
     });
     if (!res.ok) return setServerVersions([]);
 
@@ -205,7 +230,7 @@ const JarDownloadForm: Component = () => {
             value="use"
             class="p-2 rounded-md border border-neutral-300 hover:border-sky-100 hover:bg-sky-100 transition-colors"
           >
-            Use
+            Download & Use
           </button>
         </div>
       </div>
