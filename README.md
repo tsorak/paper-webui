@@ -1,22 +1,9 @@
 # Paper Webui
 
-Manage a [PaperMC](https://papermc.io/) server through a webui
+Manage a [PaperMC](https://papermc.io/) server through a WebUI
 
-(Probably, maybe, possibly... works with a standard Minecraft server aswell)
+## Current Features
 
-## Todo / random thoughts
-
-- [x] Live server logs
-- [x] Sending "raw" server commands through webui
-- [ ] Instance "Stopping" state
-- [ ] Simple webui only setup using [PaperMC API](https://api.papermc.io/v2/projects/paper/) (also maybe using Mojangs standard releases) + eula accept form
-- [ ] Initial and max memory management
-- [x] Players online molecule (roles, OP level?)
-- [ ] Multi-instance~
-- [ ] Whitelist management
-- [ ] Ports management
-- [ ] Webui authentication
-- [ ] World management tab
-- [x] Fix downloaded jars not appearing in downloaded jars list (fs-watch @/jars, ws emit)
-- [ ] Implement serverMessage patternmatching based on whether the logLine starts with, includes or is an exact match to the phrase.
-- [x] Improve readability in saves_manifest init with fs/exists
+- Live server logs
+- Sending Minecraft server commands through the WebUI
+- Simple webui only setup (Jar download + EULA accept)
