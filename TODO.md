@@ -28,14 +28,14 @@
 
 ### WIP Refactor
 
-- [ ] Static route
-  - Break out into smaller functions
 - [ ] Line parser
   - Break out into smaller functions
 
 #### May-be done refactoring
 
 - [x] Improve readability in saves_manifest init with fs/exists
+- [x] Static route
+  - Break out into smaller functions
 
 ### WIP Bugs
 

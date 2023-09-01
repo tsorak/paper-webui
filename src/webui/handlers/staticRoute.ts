@@ -1,53 +1,45 @@
 import { Hono } from "hono/mod.ts";
-import { resolve } from "path/resolve.ts";
 
-import { debugCommandOutput } from "@/src/utils/process.ts";
-
-import { getCurrentInstance } from "@/main.ts";
 import { mc } from "@/src/queue.ts";
+import * as static_helper from "@/src/webui/helpers/static_helper.ts";
 
 const app = new Hono();
 
 app.get("/assets/:filename", async (c) => {
   const file = c.req.param("filename");
-  if (file.endsWith(".js")) {
-    c.res.headers.set("Content-Type", "application/javascript");
-  }
-  const fileData = await Deno.readFile(
-    resolve(Deno.cwd(), `./client/dist/assets/`, file)
-  );
+  if (!file) return c.notFound();
+
+  const assetExists = await static_helper.assetExists(file);
+  if (!assetExists) return c.notFound();
+
+  c.res.headers.set("Content-Type", static_helper.getContentType(file));
+
+  const fileData = await static_helper.getAssetData(file);
   return c.newResponse(fileData);
 });
 
 app
   .get("/", async (c) => {
-    const worldReady = getCurrentInstance()?.worldReady ?? false;
+    if (!Deno.env.has("DEV")) return c.html(await static_helper.getIndex());
 
-    if (c.req.headers.get("accept") === "application/json") {
-      return c.json({ worldReady });
+    const build = await static_helper.buildApp();
+    if (!build.success) {
+      return c.json({ message: "Failed to build app" }, 500);
     }
 
-    //build SolidJS app
-    const clientBuilt = await new Deno.Command("npm", {
-      args: ["run", "build"],
-      cwd: resolve(Deno.cwd(), "./client"),
-      stdout: "piped",
-      stderr: "piped",
-    }).output();
-
-    if (!clientBuilt.success) {
-      debugCommandOutput(clientBuilt);
-    }
-
-    const html = await Deno.readTextFile(
-      resolve(Deno.cwd(), "./client/dist/index.html")
-    );
-    return c.html(html);
+    return c.html(await static_helper.getIndex());
   })
   .post("/", async (c) => {
-    const body = (await c.req.json()) as { command: string };
+    if (static_helper.isJsonContentType(c.req.headers) === false) {
+      return c.json({ message: "Bad Request" }, 400);
+    }
 
-    mc.sendCMD(body.command);
+    const command = await static_helper.getCommandFromBody(c.req);
+    if (command === undefined) {
+      return c.json({ message: "Bad Request" }, 400);
+    }
+
+    mc.sendCMD(command);
 
     return c.json({ message: "OK" }, 200);
   });
