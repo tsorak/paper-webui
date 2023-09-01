@@ -2,8 +2,8 @@ import {
   determineEventType,
   parsePlayerMessage,
   parseServerMessage,
-} from "@/src/subprocess/mc_events/lineParser.ts";
-import * as event_maps from "@/src/subprocess/mc_events/map.ts";
+} from "@/src/subprocess/mc_events/line_parser.ts";
+import * as event_maps from "@/src/subprocess/mc_events/trigger_maps.ts";
 
 const handleMcOutput = (line: string): void => {
   const eventType = determineEventType(line);
@@ -50,4 +50,4 @@ export {
   removePlayerCommand,
   setServerMessageTrigger,
   removeServerMessageTrigger,
-} from "@/src/subprocess/mc_events/setPattern.ts";
+} from "@/src/subprocess/mc_events/set_pattern.ts";

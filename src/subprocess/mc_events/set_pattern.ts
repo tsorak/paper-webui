@@ -2,7 +2,7 @@ import {
   PlayerSentMessage,
   ServerSentMessage,
 } from "@/src/subprocess/mc_events/types.ts";
-import * as event_maps from "@/src/subprocess/mc_events/map.ts";
+import * as trigger_maps from "@/src/subprocess/mc_events/trigger_maps.ts";
 
 function setPlayerCommand(
   specifier: string | string[],
@@ -11,22 +11,22 @@ function setPlayerCommand(
   if (Array.isArray(specifier)) {
     return specifier.forEach((cmd) => setPlayerCommand(cmd, handler));
   }
-  event_maps.playerCommandHandlers.set(specifier, handler);
+  trigger_maps.playerCommandHandlers.set(specifier, handler);
 }
 
 function setServerMessageTrigger(
   specifier: string,
   handler: (data: ServerSentMessage) => void
 ): void {
-  event_maps.serverMessageHandlers.set(specifier, handler);
+  trigger_maps.serverMessageHandlers.set(specifier, handler);
 }
 
 function removePlayerCommand(playerCommand: string) {
-  return event_maps.playerCommandHandlers.delete(playerCommand);
+  return trigger_maps.playerCommandHandlers.delete(playerCommand);
 }
 
 function removeServerMessageTrigger(serverMessage: string) {
-  return event_maps.serverMessageHandlers.delete(serverMessage);
+  return trigger_maps.serverMessageHandlers.delete(serverMessage);
 }
 
 export {

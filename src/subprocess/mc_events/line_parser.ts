@@ -3,7 +3,7 @@ import {
   ServerSentMessage,
 } from "@/src/subprocess/mc_events/types.ts";
 
-import * as player_parser from "@/src/subprocess/mc_events/playerParser.ts";
+import * as player_parser from "@/src/subprocess/mc_events/player_parser.ts";
 
 function determineEventType(line: string): "player" | "server" | "other" {
   if (!lineHasLogLevel(line)) return "other";
