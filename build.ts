@@ -1,9 +1,11 @@
 import { resolve, toFileUrl } from "path/mod.ts";
 import { exists } from "fs/mod.ts";
 
+import { debugCommandOutput } from "@/src/utils/process.ts";
+
 async function build() {
   //   const cleanedLatestLog = cleanLatestLog();
-  const clientBuilt = buildClient();
+  const clientPrepareState = prepareClient();
 
   const faultyDirs = await getFaultyDirs();
 
@@ -16,20 +18,49 @@ async function build() {
 
   await eula();
 
-  return { clientReadyState: clientBuilt };
+  return { clientPrepareState };
+}
+
+async function prepareClient() {
+  console.log("Preparing client...");
+
+  const install = await installClientDependencies();
+  if (!install.success) {
+    console.log("Failed to install client dependencies.");
+    debugCommandOutput(install);
+    return install;
+  }
+  console.log("Installed client dependencies.");
+
+  const build = await buildClient();
+  if (!build.success) {
+    console.log("Failed to build client.");
+    debugCommandOutput(build);
+    return build;
+  }
+  console.log("Client built successfully.");
+
+  return build;
+}
+
+async function installClientDependencies() {
+  const npmProcess = new Deno.Command("npm", {
+    args: ["install"],
+    cwd: resolve(Deno.cwd(), "client"),
+    stdout: "piped",
+    stderr: "piped",
+  }).output();
+
+  return await npmProcess;
 }
 
 async function buildClient() {
   const npmProcess = new Deno.Command("npm", {
-    args: ["install"],
+    args: ["run", "build"],
     cwd: resolve(Deno.cwd(), "client"),
+    stdout: "piped",
+    stderr: "piped",
   }).output();
-
-  async function echoDone() {
-    await npmProcess;
-    console.log("Client dependencies installed.");
-  }
-  echoDone();
 
   return await npmProcess;
 }
@@ -104,4 +135,4 @@ async function eula() {
   await Deno.writeTextFile(eulaPath, "eula=true\n", { create: true });
 }
 
-export default build;
+export { build as default, buildClient };
