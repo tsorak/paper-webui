@@ -3,82 +3,74 @@ import {
   ServerSentMessage,
 } from "@/src/subprocess/mc_events/types.ts";
 
-function determineEventType(line: string):
-  | {
-      type: "player";
-      data: PlayerSentMessage;
-    }
-  | {
-      type: "server";
-      data: ServerSentMessage;
-    }
-  | {
-      type: "other";
-      data: string;
-    } {
-  const playerMessage = tryParseAsPlayerSentMessage(line);
-  const serverMessage = tryParseAsServerSentMessage(line);
+import * as player_parser from "@/src/subprocess/mc_events/playerParser.ts";
 
-  if (playerMessage) {
-    return { type: "player", data: playerMessage };
-  } else if (serverMessage) {
-    return { type: "server", data: serverMessage };
+function determineEventType(line: string): "player" | "server" | "other" {
+  if (!lineHasLogLevel(line)) return "other";
+
+  if (isPlayerSentMessage(line)) {
+    return "player";
   } else {
-    return { type: "other", data: line };
+    return "server";
   }
 }
 
-function tryParseAsPlayerSentMessage(
-  line: string
-): PlayerSentMessage | undefined {
-  const lineInfo = line.split("]: ")[0];
+function isPlayerSentMessage(line: string): boolean {
+  const [_logLevel, rest] = separateAfterLogLevel(line);
 
+  return player_parser.check.startsWithNametag(rest);
+}
+
+// function isServerSentMessage(line: string): boolean {
+//   //
+// }
+
+function lineHasLogLevel(line: string): boolean {
+  return line.search(/^\[(\d{2}:\d{2}:\d{2})\ \w+\]/gim) === 0;
+}
+
+/**
+ * @example separateAfterLogLevel("[13:37:00 INFO]: <Notch> !echo Hello World!")
+ * //=> ["[13:37:00 INFO]", "<Notch> !echo Hello World!"]
+ */
+function separateAfterLogLevel(line: string): [string, string] {
   const splits = line.split("]: ");
-  splits.shift();
-  const lineContent = splits.join("]: ");
-  if (lineInfo && lineContent?.startsWith("<")) {
-    const nametagStart = lineContent.indexOf("<");
-    const nametagEnd = lineContent.indexOf(">");
-    const playername = lineContent.substring(nametagStart + 1, nametagEnd);
 
-    const message = lineContent.substring(nametagEnd + 2).trim();
+  const logLevel = splits.shift()!;
+  const rest = splits.join("]: ");
 
-    if (!message.startsWith("!")) return { playername, message, timestamp: "" };
-
-    const spaceSplits = message.split(" ");
-    // The ! operator is used since we know the first index of `spaceSplits` will be at least "!".
-    const commandName = spaceSplits.shift()!.substring(1) || undefined;
-    if (!commandName) return { playername, message, timestamp: "" };
-    const args = spaceSplits;
-
-    const command = {
-      commandName,
-      args,
-    };
-
-    return { playername, message, timestamp: "", command };
-  }
-
-  return undefined;
+  return [logLevel, rest];
 }
 
-function tryParseAsServerSentMessage(
-  line: string
-): ServerSentMessage | undefined {
-  const lineInfo = line.split("]: ")[0];
+/**
+ * @example parsePlayerSentMessage("[13:37:00 INFO]: <Notch> !echo Hello World!")
+ * //=> { playername: "Notch", message: "!echo Hello World!", timestamp: "", command: { commandName: "echo", args: ["Hello", "World!"] } }
+ */
+function parsePlayerMessage(line: string): PlayerSentMessage {
+  const [_logLevel, rest] = separateAfterLogLevel(line);
 
-  const splits = line.split("]: ");
-  splits.shift();
-  const lineContent = splits.join("]: ");
-  if (lineInfo && lineContent) {
-    const message = lineContent;
+  const playername = player_parser.get.nametag(rest);
+  const playerMessage = player_parser.get.message(rest);
 
-    return { message, timestamp: "" };
+  if (!player_parser.check.isCommand(playerMessage)) {
+    return { playername, message: playerMessage, timestamp: "" };
   }
+
+  const commandName = player_parser.get.commandName(playerMessage);
+  const commandArgs = player_parser.get.commandArgs(playerMessage);
+
+  const command = {
+    commandName,
+    args: commandArgs,
+  };
+
+  return { playername, message: playerMessage, timestamp: "", command };
 }
 
-export {
-  determineEventType,
-  tryParseAsPlayerSentMessage,
-  tryParseAsServerSentMessage,
-};
+function parseServerMessage(line: string): ServerSentMessage {
+  const [_logLevel, rest] = separateAfterLogLevel(line);
+
+  return { message: rest, timestamp: "" };
+}
+
+export { determineEventType, parsePlayerMessage, parseServerMessage };

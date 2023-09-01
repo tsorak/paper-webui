@@ -1,10 +1,10 @@
 // import * as log from "@/src/log.ts";
 import initMc from "@/src/subprocess/mc.ts";
 import {
-  setPlayerCommandListener,
-  setServerMessageListener,
-  removePlayerCommandListener as _removePlayerCommandListener,
-  removeServerMessageListener,
+  setPlayerCommand,
+  setServerMessageTrigger,
+  removePlayerCommand as _removePlayerCommand,
+  removeServerMessageTrigger,
 } from "@/src/subprocess/mc_events.ts";
 import { mc, rnr } from "@/src/queue.ts";
 import * as ws from "@/src/websocket-server/ws.ts";
@@ -14,7 +14,7 @@ import * as world_manager from "@/src/subprocess/world_manager.ts";
 import * as saves_manifest from "@/src/subprocess/saves_manifest.ts";
 
 export default function setupPatterns(p: ReturnType<typeof initMc>) {
-  setServerMessageListener("Done (", () => {
+  setServerMessageTrigger("Done (", () => {
     console.log("World ready");
     p.worldReady = true;
 
@@ -22,7 +22,7 @@ export default function setupPatterns(p: ReturnType<typeof initMc>) {
     ws.emit.instanceStatus({ running: true, worldReady: true });
   });
 
-  setServerMessageListener("logged in with entity", (data) => {
+  setServerMessageTrigger("logged in with entity", (data) => {
     const [name] = data.message.split("[");
 
     mc.sendCMD(`say Hello ${name}!`);
@@ -32,7 +32,7 @@ export default function setupPatterns(p: ReturnType<typeof initMc>) {
     ws.emit.instancePlayers(players.getAll());
   });
 
-  setServerMessageListener("lost connection:", (data) => {
+  setServerMessageTrigger("lost connection:", (data) => {
     const [name] = data.message.split(" ");
 
     players.remove(name);
@@ -40,20 +40,20 @@ export default function setupPatterns(p: ReturnType<typeof initMc>) {
     ws.emit.instancePlayers(players.getAll());
   });
 
-  setServerMessageListener("Stopping server", () => {
+  setServerMessageTrigger("Stopping server", () => {
     players.clear();
 
     ws.emit.instancePlayers(players.getAll());
   });
 
-  setPlayerCommandListener("echo", (data) => {
+  setPlayerCommand("echo", (data) => {
     const playerName = data.playername;
     const message = data.command!.args.join(" ");
 
     mc.sendCMD(`w ${playerName} ${message}`);
   });
 
-  setPlayerCommandListener(["skipworld", "sw"], async () => {
+  setPlayerCommand(["skipworld", "sw"], async () => {
     mc.sendCMD("say Skipping world...");
     mc.sendCMD("stop");
     const instance = getCurrentInstance();
@@ -69,15 +69,15 @@ export default function setupPatterns(p: ReturnType<typeof initMc>) {
     rnr.push("start");
   });
 
-  setPlayerCommandListener(["save", "backup", "sc"], (data) => {
+  setPlayerCommand(["save", "backup", "sc"], (data) => {
     const [savename] = data.command!.args;
     mc.sendCMD(
       `say ${savename ? `Saving world as '${savename}'` : "Saving world"}...`
     );
 
     mc.sendCMD("save-all");
-    setServerMessageListener("Saved the game", async () => {
-      removeServerMessageListener("Saved the game");
+    setServerMessageTrigger("Saved the game", async () => {
+      removeServerMessageTrigger("Saved the game");
       const saveResult = await world_manager.saveCurrent(savename);
 
       if (saveResult.success) {
@@ -89,13 +89,13 @@ export default function setupPatterns(p: ReturnType<typeof initMc>) {
     });
   });
 
-  setPlayerCommandListener("reindex", async () => {
+  setPlayerCommand("reindex", async () => {
     const _ = await saves_manifest.reindex();
 
     mc.sendCMD("say Reindexed saves.");
   });
 
-  setPlayerCommandListener("listsaves", async (data) => {
+  setPlayerCommand("listsaves", async (data) => {
     await saves_manifest.reindex();
     const saves = await saves_manifest.getAll();
 
@@ -116,7 +116,7 @@ export default function setupPatterns(p: ReturnType<typeof initMc>) {
     });
   });
 
-  setPlayerCommandListener(["loadsave", "load"], async (data) => {
+  setPlayerCommand(["loadsave", "load"], async (data) => {
     await saves_manifest.reindex();
     const [saveNameRaw, replaceCurrentRaw] = data.command!.args;
 
