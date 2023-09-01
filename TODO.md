@@ -47,3 +47,4 @@
 
 - [ ] Instance "Stopping" state
 - [ ] Multi-instance~
+- [ ] Have the `skipworld` command run a separate instance in the background for generating a new world
