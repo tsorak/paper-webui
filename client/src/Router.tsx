@@ -3,6 +3,7 @@ import { Component, Switch, Match } from "solid-js";
 import { useViewContext } from "./context/viewContext";
 import Overview from "./views/Overview";
 import Versions from "./views/Versions";
+import Saves from "./views/Saves";
 
 const Router: Component = () => {
   const viewIs = (view: string) => useViewContext().view() === view;
@@ -12,6 +13,9 @@ const Router: Component = () => {
       <Switch>
         <Match when={viewIs("overview")}>
           <Overview />
+        </Match>
+        <Match when={viewIs("saves")}>
+          <Saves />
         </Match>
         <Match when={viewIs("logs")}>
           <div>Logs</div>
