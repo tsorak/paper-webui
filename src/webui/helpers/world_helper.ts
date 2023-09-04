@@ -8,7 +8,6 @@ interface SavesOverview {
   currentVersion?: string;
   saves: {
     name: string;
-    version?: string;
     jar?: string;
     deleted?: boolean;
   }[];
@@ -37,7 +36,7 @@ async function getSaves() {
 }
 
 async function getCurrentWorld(): Promise<
-  { name: "world"; version?: string } | undefined
+  { name: "world"; jar?: string } | undefined
 > {
   const path = resolve(Deno.cwd(), "mc/world");
   if (!(await exists(path))) return undefined;
@@ -45,8 +44,8 @@ async function getCurrentWorld(): Promise<
   // The world version can not always be determined from looking at the active server version.
   // The user may have moved a world from another server version manually.
 
-  const version = await mc_version.getActiveVersion();
-  return { name: "world", version };
+  const jar = await mc_version.getActiveVersion();
+  return { name: "world", jar };
 }
 
 export { getSavesOverview };
