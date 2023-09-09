@@ -10,6 +10,10 @@ interface RenameProp extends Prop {
   newName: string;
 }
 
+interface LoadProp extends Prop {
+  autoRestart: boolean;
+}
+
 const validate = {
   POST: validator("json", (value, c) => {
     const OUTER_OBJ_SCHEMA = z.object({
@@ -32,13 +36,15 @@ const validate = {
 
     if (kind === "rename") {
       return validateRename({ kind, props }, c);
+    } else if (kind === "load") {
+      return validateLoad({ kind, props }, c);
     }
     return validateProp({ kind, props }, c);
   }),
 };
 
 function validateProp(
-  value: { kind: "load" | "delete" | "clone" | "download"; props: unknown },
+  value: { kind: "delete" | "clone" | "download"; props: unknown },
   c: Context
 ) {
   const PROP_SCHEMA = z.object({
@@ -69,4 +75,20 @@ function validateRename(value: { kind: "rename"; props: unknown }, c: Context) {
   };
 }
 
+function validateLoad(value: { kind: "load"; props: unknown }, c: Context) {
+  const LOAD_SCHEMA = z.object({
+    name: z.string(),
+    autoRestart: z.boolean(),
+  });
+
+  const { success } = LOAD_SCHEMA.safeParse(value.props);
+  if (!success) return badRequest(c);
+
+  return {
+    kind: value.kind,
+    props: value.props as LoadProp,
+  };
+}
+
+export type { Prop, RenameProp, LoadProp };
 export { validate };

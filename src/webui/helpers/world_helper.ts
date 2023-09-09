@@ -3,6 +3,7 @@ import { resolve } from "path/mod.ts";
 
 import * as saves_manifest from "@/src/subprocess/saves_manifest.ts";
 import * as mc_version from "@/src/subprocess/mc_version.ts";
+import * as world_manager from "@/src/subprocess/world_manager.ts";
 
 interface SavesOverview {
   currentVersion?: string;
@@ -48,4 +49,17 @@ async function getCurrentWorld(): Promise<
   return { name: "world", jar };
 }
 
-export { getSavesOverview };
+async function saveExists(name: string): Promise<boolean> {
+  await saves_manifest.reindex();
+
+  const save = await saves_manifest.get(name);
+  if (!save || save.deleted) return false;
+
+  return true;
+}
+
+async function loadSave(name: string) {
+  return await world_manager.loadWorld(name, true);
+}
+
+export { getSavesOverview, saveExists, loadSave };
