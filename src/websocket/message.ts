@@ -50,7 +50,7 @@ export type InstanceStdoutData = string;
 export type InstancePlayerData = string[];
 export type JarsChangeData =
   | { initialState: string[] }
-  | { jarName: string; action: "add" | "delete" };
+  | { jarName: string; action: "add" | "delete" | "set" };
 
 function parse(message: string): Message | null {
   try {

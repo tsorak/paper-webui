@@ -2,7 +2,7 @@ import { clients } from "@/src/websocket-server/clients.ts";
 import type { JarsChangeData } from "@/src/websocket/message.ts";
 import { jarDirState } from "@/src/fs-watcher/jars-watcher.ts";
 
-function emitJarsChange(data: JarsChangeData) {
+export function emitJarsChange(data: JarsChangeData) {
   clients.forEach((client) => {
     client.ws.json({
       type: "jars_change",

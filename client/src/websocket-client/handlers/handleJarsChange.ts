@@ -23,6 +23,8 @@ export default function handleJarsChange(
         updated.delete(jars.jarName);
         return updated;
       });
+    } else if (jars.action === "set") {
+      setMcContext("jars", "activeJar", jars.jarName);
     }
   }
 }

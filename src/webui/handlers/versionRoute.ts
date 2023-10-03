@@ -3,6 +3,8 @@ import { Hono } from "hono/mod.ts";
 import * as serverVersions from "@/src/subprocess/mc_version.ts";
 import * as jar_manager from "@/src/subprocess/jar_manager.ts";
 
+import * as ws from "@/src/websocket-server/ws.ts";
+
 const app = new Hono();
 
 app
@@ -19,6 +21,10 @@ app
     }
 
     const success = await jar_manager.setActiveJar(`./jars/${jarName}`);
+
+    if (success) {
+      ws.emit.instanceJars({ jarName, action: "set" });
+    }
 
     return c.json({ success }, success ? 200 : 400);
   });
@@ -69,6 +75,10 @@ app
         jar.name,
         submitType
       );
+
+      if (submitType === "use") {
+        ws.emit.instanceJars({ jarName: jar.name, action: "set" });
+      }
 
       return c.json({ message: jarStatus.message, ...jar }, jarStatus.status);
     }

@@ -52,9 +52,6 @@ const InstalledJars: Component = () => {
       },
       body: JSON.stringify({ jarName: version }),
     });
-    if (!res.ok) return;
-
-    mutMcContext("jars", "activeJar", version);
   };
 
   createEffect(() => {
@@ -152,10 +149,6 @@ const JarDownloadForm: Component = () => {
 
     const data = (await res.json()) as { url: string; name: string };
     console.log("Adding jar", data);
-
-    if (submitType === "download") return;
-    const [_, mutMcContext] = useMcContext();
-    mutMcContext("jars", "activeJar", data.name);
   }
 
   async function handleServerTypeChange(e: Event) {
