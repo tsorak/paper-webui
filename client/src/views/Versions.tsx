@@ -153,6 +153,7 @@ const JarDownloadForm: Component = () => {
     const data = (await res.json()) as { url: string; name: string };
     console.log("Adding jar", data);
 
+    if (submitType === "download") return;
     const [_, mutMcContext] = useMcContext();
     mutMcContext("jars", "activeJar", data.name);
   }
