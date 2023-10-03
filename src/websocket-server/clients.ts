@@ -9,12 +9,12 @@ const clients = new Map<string, Client>();
 
 function add(ws: WS) {
   clients.set(ws.id, { ws });
-  console.log(`Add client ${ws.id}`);
+  console.log(`[WS] %c+%c ${ws.id}`, "color: #0f0", "color: initial");
 }
 
 function remove(ws: WS) {
   clients.delete(ws.id);
-  console.log(`Remove client ${ws.id}`);
+  console.log(`[WS] %c-%c ${ws.id}`, "color: #f00", "color: initial");
 }
 
 export { clients, add, remove };
