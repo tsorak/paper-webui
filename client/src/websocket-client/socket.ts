@@ -29,7 +29,10 @@ const socket = {
   },
 
   createInstance: () => {
-    const _socket = new WebSocket("ws://localhost:8080");
+    const wsEndpoint = new URL(location.origin);
+    wsEndpoint.protocol = "ws:";
+
+    const _socket = new WebSocket(wsEndpoint);
     return _socket;
   },
 
