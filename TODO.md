@@ -20,6 +20,14 @@
   - [ ] UI
     - Table structure? [Name, Version, Created]
     - Controls (Load, Clone?, Delete, Download) on each entry / static (or sticky) toolbar on top
+    - Load world
+      - [ ] Display current world deletion confirmation
+      - [ ] Offer to back up current world before loading new one
+        - Savename form
+- [ ] Datapacks management
+  - Persist datapacks between saves option?
+  - [ ] HTTP API
+  - [ ] UI
 - [ ] Initial and max memory management
 - [ ] Whitelist management
 - [ ] Ports management
