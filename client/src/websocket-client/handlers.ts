@@ -45,7 +45,7 @@ function handleClose(
 
   if (e.code === 1006) {
     logWS(`Attempting to reconnect...`);
-    reconnectFn();
+    setTimeout(reconnectFn, 1000);
   }
 
   useMcContext()[1]("mcInstance", "status", "pending");
