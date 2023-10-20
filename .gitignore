@@ -3,4 +3,4 @@ mc/
 *.log
 jars/
 .saves_manifest.json
-saves/
+/saves
