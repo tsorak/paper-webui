@@ -1,6 +1,7 @@
 import { Context, validator } from "hono/mod.ts";
 import { z } from "zod/mod.ts";
 import badRequest from "@/src/utils/badRequest.ts";
+import { createDateFilename } from "@/src/utils/savename.ts";
 
 interface Prop {
   name: string;
@@ -12,6 +13,10 @@ interface RenameProp extends Prop {
 
 interface LoadProp extends Prop {
   autoRestart: boolean;
+}
+
+interface CloneProp extends Prop {
+  to: string;
 }
 
 const validate = {
@@ -38,13 +43,15 @@ const validate = {
       return validateRename({ kind, props }, c);
     } else if (kind === "load") {
       return validateLoad({ kind, props }, c);
+    } else if (kind === "clone") {
+      return validateClone({ kind, props }, c);
     }
     return validateProp({ kind, props }, c);
   }),
 };
 
 function validateProp(
-  value: { kind: "delete" | "clone" | "download"; props: unknown },
+  value: { kind: "delete" | "download"; props: unknown },
   c: Context
 ) {
   const PROP_SCHEMA = z.object({
@@ -57,6 +64,27 @@ function validateProp(
   return {
     kind: value.kind,
     props: value.props as Prop,
+  };
+}
+
+function validateClone(value: { kind: "clone"; props: unknown }, c: Context) {
+  const CLONE_SCHEMA = z.object({
+    name: z.string(),
+    to: z
+      .string()
+      .default("")
+      .transform((v) => {
+        if (v) return v;
+        return createDateFilename();
+      }),
+  });
+
+  const { success } = CLONE_SCHEMA.safeParse(value.props);
+  if (!success) return badRequest(c);
+
+  return {
+    kind: value.kind,
+    props: value.props as CloneProp,
   };
 }
 
@@ -90,5 +118,5 @@ function validateLoad(value: { kind: "load"; props: unknown }, c: Context) {
   };
 }
 
-export type { Prop, RenameProp, LoadProp };
+export type { Prop, RenameProp, LoadProp, CloneProp };
 export { validate };
