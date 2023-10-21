@@ -69,8 +69,9 @@ async function hasActiveWorld(): Promise<boolean> {
 
 async function loadWorld(
   saveName: string,
-  replaceCurrent = false
+  options?: { replaceCurrent?: boolean }
 ): Promise<{ success: true } | { success: false; reason: string }> {
+  const replaceCurrent = options?.replaceCurrent ?? false;
   if (replaceCurrent) await deleteCurrent();
 
   if ((await hasActiveWorld()) && !replaceCurrent) {

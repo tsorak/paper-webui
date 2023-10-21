@@ -61,8 +61,10 @@ async function saveExists(name: string): Promise<boolean> {
   return true;
 }
 
-async function loadSave(name: string) {
-  return await world_manager.loadWorld(name, true);
+async function loadSave(name: string, options?: { replaceCurrent?: boolean }) {
+  const { replaceCurrent } = options ?? {};
+
+  return await world_manager.loadWorld(name, { replaceCurrent });
 }
 
 async function cloneSave(name: string, to: string) {
