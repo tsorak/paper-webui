@@ -50,7 +50,14 @@ const has = async (savename: string): Promise<boolean> => {
 const add = async (entry: SaveEntry) => {
   const manifest = await loadManifest();
 
-  manifest.push(entry);
+  const i = manifest.findIndex(
+    (currentEntry) => currentEntry.name === entry.name
+  );
+  if (i === -1) {
+    manifest.push(entry);
+  } else {
+    manifest[i] = entry;
+  }
 
   return await writeManifest(manifest);
 };
