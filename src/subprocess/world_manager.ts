@@ -61,6 +61,24 @@ async function deleteCurrent() {
   return await Promise.all(deletions);
 }
 
+async function deleteWorld(
+  savename: string
+): Promise<{ success: true } | { success: false; reason?: string }> {
+  try {
+    await Deno.remove(resolve(Deno.cwd(), `./saves/${savename}`));
+  } catch (err) {
+    console.error(err);
+    return {
+      success: false,
+      reason: `Failed to remove ${savename} from disk.`,
+    };
+  }
+
+  const deleteResult = await saves_manifest.update(savename, { deleted: true });
+
+  return { success: deleteResult };
+}
+
 // async function hasCurrentBeenSaved(): Promise<boolean> {}
 
 async function hasActiveWorld(): Promise<boolean> {
@@ -122,4 +140,5 @@ export {
   hasActiveWorld,
   loadWorld,
   cloneWorld,
+  deleteWorld,
 };

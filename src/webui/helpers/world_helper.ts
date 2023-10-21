@@ -5,6 +5,7 @@ import * as saves_manifest from "@/src/subprocess/saves_manifest.ts";
 import * as mc_version from "@/src/subprocess/mc_version.ts";
 import * as world_manager from "@/src/subprocess/world_manager.ts";
 import { ensureZipExtension } from "@/src/utils/savename.ts";
+import { getCurrentInstance } from "@/main.ts";
 
 interface SavesOverview {
   currentVersion?: string;
@@ -81,4 +82,23 @@ async function cloneSave(name: string, to: string) {
   return await world_manager.cloneWorld(name, to);
 }
 
-export { getSavesOverview, saveExists, loadSave, cloneSave };
+async function deleteSave(
+  name: string
+): Promise<{ success: true } | { success: false; reason?: string }> {
+  if (name === "world") {
+    if (getCurrentInstance()?.running) {
+      return {
+        success: false,
+        reason: "Can not delete the active world while the server is running.",
+      };
+    }
+
+    await world_manager.deleteCurrent();
+    return { success: true };
+  }
+
+  name = ensureZipExtension(name);
+  return await world_manager.deleteWorld(name);
+}
+
+export { getSavesOverview, saveExists, loadSave, cloneSave, deleteSave };

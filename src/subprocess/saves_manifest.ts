@@ -91,7 +91,21 @@ const reindex = async () => {
   return await writeManifest(manifest);
 };
 
-export { get, has, add, getAll, reindex, init };
+const update = async (save: string, fields: Partial<SaveEntry>) => {
+  const manifest = await loadManifest();
+
+  const i = manifest.findIndex((entry) => entry.name === save);
+  if (i === -1) {
+    return false;
+  }
+
+  manifest[i] = { ...manifest[i], ...fields };
+
+  await writeManifest(manifest);
+  return true;
+};
+
+export { get, has, add, getAll, reindex, init, update };
 
 // TODO: idea with the following commented out code is to keep a stream open to the manifest file
 // could prevent rewriting the whole file every time a save is added
