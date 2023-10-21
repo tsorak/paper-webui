@@ -20,13 +20,13 @@ interface CloneProp extends Prop {
 }
 
 const validate = {
-  POST: validator("json", (value, c) => {
+  POST: validator("json", async (value, c) => {
     const OUTER_OBJ_SCHEMA = z.object({
       kind: z.string(),
       props: z.object({}),
     });
 
-    const { success } = OUTER_OBJ_SCHEMA.safeParse(value);
+    const { success } = await OUTER_OBJ_SCHEMA.safeParseAsync(value);
     if (!success) return badRequest(c);
 
     const { kind, props } = value as {
@@ -40,17 +40,17 @@ const validate = {
     }
 
     if (kind === "rename") {
-      return validateRename({ kind, props }, c);
+      return await validateRename({ kind, props }, c);
     } else if (kind === "load") {
-      return validateLoad({ kind, props }, c);
+      return await validateLoad({ kind, props }, c);
     } else if (kind === "clone") {
-      return validateClone({ kind, props }, c);
+      return await validateClone({ kind, props }, c);
     }
-    return validateProp({ kind, props }, c);
+    return await validateProp({ kind, props }, c);
   }),
 };
 
-function validateProp(
+async function validateProp(
   value: { kind: "delete" | "download"; props: unknown },
   c: Context
 ) {
@@ -58,7 +58,7 @@ function validateProp(
     name: z.string(),
   });
 
-  const { success } = PROP_SCHEMA.safeParse(value.props);
+  const { success } = await PROP_SCHEMA.safeParseAsync(value.props);
   if (!success) return badRequest(c);
 
   return {
@@ -67,7 +67,10 @@ function validateProp(
   };
 }
 
-function validateClone(value: { kind: "clone"; props: unknown }, c: Context) {
+async function validateClone(
+  value: { kind: "clone"; props: unknown },
+  c: Context
+) {
   const CLONE_SCHEMA = z.object({
     name: z.string(),
     to: z
@@ -79,7 +82,7 @@ function validateClone(value: { kind: "clone"; props: unknown }, c: Context) {
       }),
   });
 
-  const { success } = CLONE_SCHEMA.safeParse(value.props);
+  const { success } = await CLONE_SCHEMA.safeParseAsync(value.props);
   if (!success) return badRequest(c);
 
   return {
@@ -88,13 +91,16 @@ function validateClone(value: { kind: "clone"; props: unknown }, c: Context) {
   };
 }
 
-function validateRename(value: { kind: "rename"; props: unknown }, c: Context) {
+async function validateRename(
+  value: { kind: "rename"; props: unknown },
+  c: Context
+) {
   const RENAME_SCHEMA = z.object({
     name: z.string(),
     newName: z.string(),
   });
 
-  const { success } = RENAME_SCHEMA.safeParse(value.props);
+  const { success } = await RENAME_SCHEMA.safeParseAsync(value.props);
   if (!success) return badRequest(c);
 
   return {
@@ -103,13 +109,16 @@ function validateRename(value: { kind: "rename"; props: unknown }, c: Context) {
   };
 }
 
-function validateLoad(value: { kind: "load"; props: unknown }, c: Context) {
+async function validateLoad(
+  value: { kind: "load"; props: unknown },
+  c: Context
+) {
   const LOAD_SCHEMA = z.object({
     name: z.string(),
     autoRestart: z.boolean(),
   });
 
-  const { success } = LOAD_SCHEMA.safeParse(value.props);
+  const { success } = await LOAD_SCHEMA.safeParseAsync(value.props);
   if (!success) return badRequest(c);
 
   return {
