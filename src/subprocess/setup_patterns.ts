@@ -12,6 +12,11 @@ import * as players from "@/src/subprocess/players.ts";
 import { getCurrentInstance } from "@/main.ts";
 import * as world_manager from "@/src/subprocess/world_manager.ts";
 import * as saves_manifest from "@/src/subprocess/saves_manifest.ts";
+import {
+  createDateFilename,
+  ensureZipExtension,
+} from "@/src/utils/savename.ts";
+import * as world_helper from "@/src/webui/helpers/world_helper.ts";
 
 export default function setupPatterns(p: ReturnType<typeof initMc>) {
   setServerMessageTrigger("Done (", () => {
@@ -69,19 +74,24 @@ export default function setupPatterns(p: ReturnType<typeof initMc>) {
     rnr.push("start");
   });
 
-  setPlayerCommand(["save", "backup", "sc"], (data) => {
-    const [savename] = data.command!.args;
-    mc.sendCMD(
-      `say ${savename ? `Saving world as '${savename}'` : "Saving world"}...`
-    );
+  setPlayerCommand(["save", "backup", "sc"], async (data) => {
+    let savename = data.command!.args[0] || createDateFilename();
+    savename = ensureZipExtension(savename);
+
+    if (await world_helper.saveExists(savename)) {
+      mc.sendCMD(`say Save '${savename}' already exists. Aborting...`);
+      return;
+    }
+
+    mc.sendCMD(`say Saving world as '${savename}'...`);
 
     mc.sendCMD("save-all");
     setServerMessageTrigger("Saved the game", async () => {
       removeServerMessageTrigger("Saved the game");
-      const saveResult = await world_manager.saveCurrent(savename);
+      const saveResult = await world_helper.cloneSave("world", savename);
 
       if (saveResult.success) {
-        mc.sendCMD(`say Saved world as ${saveResult.savename}`);
+        mc.sendCMD(`say Saved world as ${savename}`);
         saves_manifest.reindex();
       } else {
         mc.sendCMD(`say Failed to save world. Reason: ${saveResult.reason}`);

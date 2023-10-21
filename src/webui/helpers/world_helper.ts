@@ -53,6 +53,8 @@ async function getCurrentWorld(): Promise<
 async function saveExists(name: string): Promise<boolean> {
   await saves_manifest.reindex();
 
+  name = ensureZipExtension(name);
+
   const save = await saves_manifest.get(name);
   if (!save || save.deleted) return false;
 
@@ -65,6 +67,10 @@ async function loadSave(name: string) {
 
 async function cloneSave(name: string, to: string) {
   to = ensureZipExtension(to);
+
+  if (await saveExists(to)) {
+    return { success: false, reason: "Save already exists." };
+  }
 
   if (name === "world") {
     return await world_manager.saveCurrent(to);

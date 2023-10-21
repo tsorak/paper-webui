@@ -4,6 +4,10 @@ import * as saves_manifest from "@/src/subprocess/saves_manifest.ts";
 import { resolve } from "path/resolve.ts";
 import { exists } from "fs/exists.ts";
 import { debugCommandOutput } from "@/src/utils/process.ts";
+import { ensureZipExtension } from "@/src/utils/savename.ts";
+
+// This module should not do any validation
+// Use world_helper instead as it does validation
 
 async function getSaves(): Promise<{ name: string; version: string }[]> {
   const saves: { name: string; jar?: string }[] = [];
@@ -14,38 +18,18 @@ async function getSaves(): Promise<{ name: string; version: string }[]> {
 }
 
 async function saveCurrent(
-  savename?: string
+  savename: string
 ): Promise<
-  { success: true; savename: string } | { success: false; reason: string }
+  { success: true; savedAs: string } | { success: false; reason: string }
 > {
-  savename ||= new Date()
-    .toJSON()
-    .split(".")[0]
-    .replaceAll(":", "-")
-    .replace("T", "_");
   savename = savename.replaceAll(" ", "_");
-  if (!savename.endsWith(".zip")) savename += ".zip";
-
-  const manifest_entry = await saves_manifest.get(savename);
-  if (manifest_entry && manifest_entry.deleted !== true)
-    return { success: false, reason: "Savename already exists." };
+  savename = ensureZipExtension(savename);
 
   const savePath = resolve(Deno.cwd(), `./saves/${savename}`);
   const compressResult = await zip.compress(".", savePath, {
     workdir: resolve(Deno.cwd(), "./mc"),
     flags: ["-i", "world**"],
   });
-  //   const possibleDimensions = ["world", "world_nether", "world_the_end"];
-  //   const dimensions: string[] = [];
-  //   for await (const entry of Deno.readDir(resolve(Deno.cwd(), "./mc"))) {
-  //     if (possibleDimensions.includes(entry.name) && entry.isDirectory) {
-  //       dimensions.push(entry.name);
-  //     }
-  //   }
-  //   const savePath = resolve(Deno.cwd(), `./saves/${savename}`);
-  //   const zipResult = await zip.compress(dimensions, savePath, {
-  //     workdir: resolve(Deno.cwd(), "./mc"),
-  //   });
 
   if (!compressResult.success) {
     debugCommandOutput(compressResult);
@@ -55,7 +39,7 @@ async function saveCurrent(
   const currentJar = await mc_version.getActiveVersion();
   await saves_manifest.add({ name: savename, jar: currentJar });
 
-  return { success: true, savename };
+  return { success: true, savedAs: savename };
 }
 
 async function deleteCurrent() {
