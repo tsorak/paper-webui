@@ -2,7 +2,10 @@ import { Context, Hono } from "hono/mod.ts";
 
 import * as world_helper from "@/src/webui/helpers/world_helper.ts";
 import * as world_validator from "@/src/webui/validators/world_validator.ts";
-import type { LoadProp } from "@/src/webui/validators/world_validator.ts";
+import type {
+  LoadProp,
+  CloneProp,
+} from "@/src/webui/validators/world_validator.ts";
 import badRequest from "@/src/utils/badRequest.ts";
 import { getCurrentInstance } from "@/main.ts";
 import { performWithRestart } from "@/src/subprocess/helpers.ts";
@@ -22,8 +25,7 @@ app.post("/world", world_validator.validate.POST, async (c) => {
       return c.json(await world_helper.renameSave(name, newName));
     }
     case "clone": {
-      const { name } = props;
-      return c.json(await world_helper.cloneSave(name));
+      return await handleClone(props, c);
     }
     case "delete": {
       const { name } = props;
@@ -40,6 +42,20 @@ app.post("/world", world_validator.validate.POST, async (c) => {
       return badRequest(c);
   }
 });
+
+async function handleClone(props: CloneProp, c: Context) {
+  const { name, to } = props;
+
+  const saveExists = await world_helper.saveExists(name);
+  if (!saveExists) return badRequest(c);
+
+  const toExists = await world_helper.saveExists(to);
+  if (toExists) return badRequest(c);
+
+  const cloneResult = await world_helper.cloneSave(name, to);
+
+  return c.json(cloneResult);
+}
 
 async function handleLoad(props: LoadProp, c: Context) {
   const { name, autoRestart } = props;

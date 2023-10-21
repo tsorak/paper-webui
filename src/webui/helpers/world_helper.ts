@@ -4,6 +4,7 @@ import { resolve } from "path/mod.ts";
 import * as saves_manifest from "@/src/subprocess/saves_manifest.ts";
 import * as mc_version from "@/src/subprocess/mc_version.ts";
 import * as world_manager from "@/src/subprocess/world_manager.ts";
+import { ensureZipExtension } from "@/src/utils/savename.ts";
 
 interface SavesOverview {
   currentVersion?: string;
@@ -62,4 +63,14 @@ async function loadSave(name: string) {
   return await world_manager.loadWorld(name, true);
 }
 
-export { getSavesOverview, saveExists, loadSave };
+async function cloneSave(name: string, to: string) {
+  to = ensureZipExtension(to);
+
+  if (name === "world") {
+    return await world_manager.saveCurrent(to);
+  }
+
+  return await world_manager.cloneWorld(name, to);
+}
+
+export { getSavesOverview, saveExists, loadSave, cloneSave };

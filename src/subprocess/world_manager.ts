@@ -106,4 +106,38 @@ async function loadWorld(
   return { success: true };
 }
 
-export { getSaves, saveCurrent, deleteCurrent, hasActiveWorld, loadWorld };
+async function cloneWorld(
+  saveName: string,
+  to: string
+): Promise<{ success: true } | { success: false; reason: string }> {
+  if (saveName === "world") return { success: false, reason: "Invalid name." };
+
+  const saveExists = await saves_manifest.get(saveName);
+  if (!saveExists) return { success: false, reason: "Save does not exist." };
+
+  const toExists = await saves_manifest.get(to);
+  if (toExists) return { success: false, reason: "Save already exists." };
+
+  try {
+    await Deno.copyFile(
+      resolve(Deno.cwd(), `./saves/${saveName}`),
+      resolve(Deno.cwd(), `./saves/${to}`)
+    );
+  } catch (err) {
+    console.error(err);
+    return { success: false, reason: "Clone process failed." };
+  }
+
+  await saves_manifest.add({ name: to, jar: saveExists.jar });
+
+  return { success: true };
+}
+
+export {
+  getSaves,
+  saveCurrent,
+  deleteCurrent,
+  hasActiveWorld,
+  loadWorld,
+  cloneWorld,
+};
