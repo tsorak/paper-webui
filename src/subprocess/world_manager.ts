@@ -99,9 +99,6 @@ async function cloneWorld(
   const saveExists = await saves_manifest.get(saveName);
   if (!saveExists) return { success: false, reason: "Save does not exist." };
 
-  const toExists = await saves_manifest.get(to);
-  if (toExists) return { success: false, reason: "Save already exists." };
-
   try {
     await Deno.copyFile(
       resolve(Deno.cwd(), `./saves/${saveName}`),
