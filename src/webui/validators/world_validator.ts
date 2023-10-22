@@ -97,12 +97,14 @@ function validateClone(value: { kind: "clone"; props: unknown }, c: Context) {
       }),
   });
 
-  const { success } = CLONE_SCHEMA.safeParse(value.props);
-  if (!success) return badRequest(c);
+  const parseResult = CLONE_SCHEMA.safeParse(value.props);
+  if (!parseResult.success) return badRequest(c);
+
+  const parsedProps = parseResult.data;
 
   return {
     kind: value.kind,
-    props: value.props as CloneProp,
+    props: parsedProps as CloneProp,
   };
 }
 
