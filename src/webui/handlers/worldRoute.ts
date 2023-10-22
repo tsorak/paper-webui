@@ -18,10 +18,7 @@ app.get("/world", async (c) => {
 });
 
 app.post("/world", world_validator.validate.POST, async (c) => {
-  const validated = await c.req.valid("json");
-  // A Response is never returned from the validator. We can safely exclude it.
-  type NeverResponse = Exclude<typeof validated, Response>;
-  const { kind, props } = validated as NeverResponse;
+  const { kind, props } = c.req.valid("json");
 
   switch (kind) {
     case "rename": {
