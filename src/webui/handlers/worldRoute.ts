@@ -10,6 +10,7 @@ import type {
 import badRequest from "@/src/utils/badRequest.ts";
 import { getCurrentInstance } from "@/main.ts";
 import { performWithRestart } from "@/src/subprocess/helpers.ts";
+import { hasActiveWorld } from "@/src/subprocess/world_manager.ts";
 
 const app = new Hono();
 
@@ -63,8 +64,17 @@ async function handleDelete(props: Prop, c: Context) {
 async function handleClone(props: CloneProp, c: Context) {
   const { name, to } = props;
 
-  const saveExists = await world_helper.saveExists(name);
-  if (!saveExists) return badRequest(c);
+  if (name !== "world") {
+    const saveExists = await world_helper.saveExists(name);
+    if (!saveExists) return badRequest(c);
+  } else if (!(await hasActiveWorld())) {
+    return c.json(
+      {
+        error: "There is no active world to clone.",
+      },
+      400
+    );
+  }
 
   const toExists = await world_helper.saveExists(to);
   if (toExists) return badRequest(c);
