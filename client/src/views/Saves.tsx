@@ -1,15 +1,22 @@
-import { Component, For, Setter, createResource, createSignal } from "solid-js";
+import { Component, For, Setter, createSignal, onMount } from "solid-js";
+import { useMcContext } from "../context/mcContext";
 
 const Saves: Component = () => {
+  const [mcCtx, mutMcCtx] = useMcContext();
+  const saves = () => mcCtx.saves;
+
+  onMount(async () => {
+    const { saves } = await fetchSaves();
+    mutMcCtx("saves", saves);
+  });
+
   const [selectedSave, setSelectedSave] = createSignal<string | null>(null, {
     equals(prev, next) {
-      removeSelectedClass(prev);
-      addSelectedClass(next);
+      removeSelectedClass("save-entry-" + prev);
+      addSelectedClass("save-entry-" + next);
       return prev === next;
     },
   });
-
-  const [saves, { mutate: mutSaves }] = createResource(fetchSaves);
 
   function addSelectedClass(id: string | null) {
     if (!id) return;
@@ -71,29 +78,27 @@ const Saves: Component = () => {
 };
 
 const WorldRow: Component<{
-  worldId?: string;
   name: string;
-  version: string;
-  created: string;
+  jar?: string;
+  deleted?: boolean;
   setSelectedSave: Setter<string>;
   isLast: () => boolean;
 }> = (props) => {
-  const { name, version, created, setSelectedSave, isLast } = props;
-  const worldId = props.worldId || name;
+  const { name, jar, deleted, setSelectedSave, isLast } = props;
 
   return (
     <tr
-      id={worldId}
+      id={"save-entry-" + name}
       class={`cursor-pointer ${
         isLast() === false ? "border-b border-gray-200" : ""
       }`}
-      onClick={() => setSelectedSave(worldId)}
+      onClick={() => setSelectedSave(name)}
     >
       <td ondblclick={() => console.log(`rename mode active for ${name}`)}>
         {name}
       </td>
-      <td>{version}</td>
-      <td>{created}</td>
+      <td>{jar ?? ""}</td>
+      <td>{deleted ? "DELETED" : ""}</td>
     </tr>
   );
 };
@@ -115,8 +120,15 @@ const Toolbar: Component = () => {
 async function fetchSaves() {
   const res = await fetch("/world");
 
-  if (!res.ok) return [];
-  return await res.json();
+  if (!res.ok) return { currentVersion: "", saves: [] };
+  return (await res.json()) as {
+    currentVersion: string;
+    saves: {
+      name: string;
+      jar?: string;
+      deleted?: boolean;
+    }[];
+  };
 }
 
 const determineSubmitMode = (submitter: HTMLInputElement) => {

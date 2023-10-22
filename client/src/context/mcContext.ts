@@ -12,6 +12,11 @@ export interface State {
     installed: Set<string>;
     activeJar?: string;
   };
+  saves: {
+    name: string;
+    jar?: string;
+    deleted?: boolean;
+  }[];
 }
 
 const store = createStore<State>({
@@ -24,6 +29,7 @@ const store = createStore<State>({
     installed: new Set(),
     activeJar: undefined,
   },
+  saves: [],
 });
 
 const McContext = createContext(store);
