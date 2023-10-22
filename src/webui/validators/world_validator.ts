@@ -19,6 +19,24 @@ interface CloneProp extends Prop {
   to: string;
 }
 
+type WorldBody =
+  | {
+      kind: "delete" | "download";
+      props: Prop;
+    }
+  | {
+      kind: "rename";
+      props: RenameProp;
+    }
+  | {
+      kind: "clone";
+      props: CloneProp;
+    }
+  | {
+      kind: "load";
+      props: LoadProp;
+    };
+
 const validate = {
   POST: validator("json", (value, c) => {
     const OUTER_OBJ_SCHEMA = z.object({
@@ -118,5 +136,5 @@ function validateLoad(value: { kind: "load"; props: unknown }, c: Context) {
   };
 }
 
-export type { Prop, RenameProp, LoadProp, CloneProp };
+export type { Prop, RenameProp, LoadProp, CloneProp, WorldBody };
 export { validate };

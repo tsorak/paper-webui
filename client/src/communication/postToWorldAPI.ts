@@ -1,11 +1,7 @@
 import { notificationService } from "@hope-ui/solid";
+import type { WorldBody } from "../../../src/webui/validators/world_validator.ts";
 
-export interface WorldAPIBody {
-  kind: "load" | "delete" | "clone" | "download";
-  props: { name?: string };
-}
-
-export async function postToWorldAPI(body: WorldAPIBody) {
+export async function postToWorldAPI(body: WorldBody) {
   const reqId = crypto.randomUUID();
   setWorldNotification(reqId, body);
 
@@ -20,7 +16,13 @@ export async function postToWorldAPI(body: WorldAPIBody) {
   if (!res.ok) {
     console.error(res.ok, res);
 
-    errorWorldNotification(reqId, body);
+    if (res.headers.get("Content-Type") !== "application/json") {
+      errorWorldNotification(reqId, body);
+      return;
+    }
+
+    const resBody = await res.json();
+    errorWorldNotification(reqId, body, resBody);
     return;
   }
 
@@ -28,7 +30,7 @@ export async function postToWorldAPI(body: WorldAPIBody) {
   console.log(res.ok, await res.json());
 }
 
-function setWorldNotification(reqId: string, body: WorldAPIBody) {
+function setWorldNotification(reqId: string, body: WorldBody) {
   let title = "";
   switch (body.kind) {
     case "load":
@@ -54,7 +56,7 @@ function setWorldNotification(reqId: string, body: WorldAPIBody) {
   });
 }
 
-function successWorldNotification(reqId: string, body: WorldAPIBody) {
+function successWorldNotification(reqId: string, body: WorldBody) {
   let title = "";
   switch (body.kind) {
     case "load":
@@ -75,10 +77,16 @@ function successWorldNotification(reqId: string, body: WorldAPIBody) {
     title,
     id: reqId,
     status: "success",
+    persistent: false,
+    duration: 3000,
   });
 }
 
-function errorWorldNotification(reqId: string, body: WorldAPIBody) {
+function errorWorldNotification(
+  reqId: string,
+  body: WorldBody,
+  resBody?: { success: boolean; reason: string }
+) {
   let title = "";
   switch (body.kind) {
     case "load":
@@ -97,7 +105,10 @@ function errorWorldNotification(reqId: string, body: WorldAPIBody) {
 
   notificationService.update({
     title,
+    description: resBody?.reason ?? "",
     id: reqId,
     status: "danger",
+    persistent: false,
+    duration: 3000,
   });
 }
