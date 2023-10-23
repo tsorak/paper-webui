@@ -99,9 +99,14 @@ async function handleLoad(props: LoadProp, c: Context) {
   const saveExists = await world_helper.saveExists(name);
   if (!saveExists) return badRequest(c);
 
-  const loadResult = await performWithRestart(
-    async () => await world_helper.loadSave(name, { replaceCurrent: false })
-  );
+  let loadResult: Awaited<ReturnType<typeof world_helper.loadSave>>;
+  if (getCurrentInstance()?.running) {
+    loadResult = await performWithRestart(
+      async () => await world_helper.loadSave(name)
+    );
+  } else {
+    loadResult = await world_helper.loadSave(name);
+  }
 
   return c.json(loadResult);
 }
