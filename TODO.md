@@ -15,15 +15,23 @@
 ## WIP
 
 - [ ] Worlds management
-  - [ ] HTTP API
+  - Backend
+    - fs-watcher for saves folder + WS trigger
+  - HTTP API
     - Abort load/delete requests if instance is running
-  - [ ] UI
-    - Table structure? [Name, Version, Created]
-    - Controls (Load, Clone?, Delete, Download) on each entry / static (or sticky) toolbar on top
-    - Load world
-      - [ ] Display current world deletion confirmation
-      - [ ] Offer to back up current world before loading new one
-        - Savename form
+  - UI
+    - [x] Table structure? [Name, Version]
+    - [ ] Separate table for deleted saves
+    - [x] Controls (Load, Clone, Delete, Download) static toolbar on top
+    - [ ] Rename
+    - [x] Load world
+      - [x] Display current world deletion confirmation
+      - [x] Offer to back up current world before loading new one
+        - [x] Savename form
+    - [x] Delete world
+      - [x] Confirmation
+    - Settings
+      - [ ] Option for disabling deletion prompt
 - [ ] Datapacks management
   - Persist datapacks between saves option?
   - [ ] HTTP API
@@ -33,6 +41,13 @@
 - [ ] Ports management
 - [ ] Webui authentication
 - [ ] Implement serverMessage patternmatching based on whether the logLine starts with, includes or is an exact match to the phrase.
+- Global cached state for reducing IO
+  - saves_manifest
+    - [x] cache saves state
+    - [ ] Update via fs-watcher
+  - jar_manifest
+    - [ ] cache jars state
+    - [ ] Update via fs-watcher
 
 ### WIP Refactor
 
