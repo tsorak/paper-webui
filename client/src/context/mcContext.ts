@@ -2,6 +2,12 @@ import { createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { InstanceStatusData } from "../websocket/message";
 
+export interface SaveEntry {
+  name: string;
+  jar?: string;
+  deleted?: boolean;
+}
+
 export interface State {
   mcInstance: {
     status: InstanceStatusData;
@@ -12,11 +18,7 @@ export interface State {
     installed: Set<string>;
     activeJar?: string;
   };
-  saves: {
-    name: string;
-    jar?: string;
-    deleted?: boolean;
-  }[];
+  saves: SaveEntry[];
 }
 
 const store = createStore<State>({

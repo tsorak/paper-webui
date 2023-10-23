@@ -8,10 +8,17 @@ import createPromiseSignal from "../utils/createPromiseSignal";
 import { WorldBody } from "../../../src/webui/validators/world_validator";
 import CloneModal from "../components/saves/CloneModal";
 import DeleteConfirmationModal from "../components/saves/DeleteConfirmation";
+import DeletedSavesTable from "../components/saves/DeletedSavesTable";
+import createCachedSignal from "../utils/cachedSignal";
 
 const Saves: Component = () => {
   const [mcCtx, mutMcCtx] = useMcContext();
-  const saves = () => mcCtx.saves;
+  const saves = () => mcCtx.saves.filter((w) => !w.deleted);
+  const deletedSaves = () => mcCtx.saves.filter((w) => w.deleted);
+  const [showDeleted, setShowDeleted] = createCachedSignal(
+    false,
+    "showDeleted"
+  );
 
   const ensureLatestSaves = async () => {
     mutMcCtx("saves", (await fetchSaves()).saves);
@@ -242,11 +249,10 @@ const Saves: Component = () => {
         </form>
         <div class="p-2 bg-white rounded-md">
           <table class="w-full table-auto">
-            <thead class="border-b border-gray-200">
-              <tr class="text-left">
-                <th>Name</th>
-                <th>Server Version</th>
-                <th>Deleted</th>
+            <thead class="border-b border-gray-200 text-sm">
+              <tr class="text-left uppercase">
+                <th class="font-medium px-1">Name</th>
+                <th class="font-medium px-1">Server Version</th>
                 {/* <th>Size</th> */}
               </tr>
             </thead>
@@ -261,6 +267,17 @@ const Saves: Component = () => {
             </tbody>
           </table>
         </div>
+        <div class="p-2 bg-white rounded-md overflow-hidden">
+          <h3
+            class="font-bold cursor-pointer"
+            onClick={() => setShowDeleted((p) => !p)}
+          >
+            Deleted saves
+          </h3>
+          <div class={`${showDeleted() ? "" : "hidden"}`}>
+            <DeletedSavesTable data={deletedSaves} />
+          </div>
+        </div>
       </main>
     </>
   );
@@ -273,7 +290,7 @@ const WorldRow: Component<{
   setSelectedSave: Setter<string>;
   isLast: () => boolean;
 }> = (props) => {
-  const { name, jar, deleted, setSelectedSave, isLast } = props;
+  const { name, jar, setSelectedSave, isLast } = props;
 
   return (
     <tr
@@ -283,11 +300,8 @@ const WorldRow: Component<{
       }`}
       onClick={() => setSelectedSave(name)}
     >
-      <td ondblclick={() => console.log(`rename mode active for ${name}`)}>
-        {name}
-      </td>
-      <td>{jar ?? ""}</td>
-      <td>{deleted ? "DELETED" : ""}</td>
+      <td class="px-2">{name}</td>
+      <td class="px-2">{jar ?? ""}</td>
     </tr>
   );
 };
