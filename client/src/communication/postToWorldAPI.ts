@@ -26,8 +26,12 @@ export async function postToWorldAPI(body: WorldBody) {
     return;
   }
 
-  successWorldNotification(reqId, body);
-  console.log(res.ok, await res.json());
+  let resBody;
+  if (res.headers.get("Content-Type") === "application/json") {
+    resBody = await res.json();
+  }
+  successWorldNotification(reqId, body, resBody);
+  console.log("postToWorldAPI success!", resBody);
 }
 
 function setWorldNotification(reqId: string, body: WorldBody) {
@@ -56,8 +60,13 @@ function setWorldNotification(reqId: string, body: WorldBody) {
   });
 }
 
-function successWorldNotification(reqId: string, body: WorldBody) {
-  let title = "";
+function successWorldNotification(
+  reqId: string,
+  body: WorldBody,
+  resBody?: Record<string, unknown>
+) {
+  let title,
+    description = "";
   switch (body.kind) {
     case "load":
       title = `Loaded ${body.props.name}`;
@@ -67,6 +76,7 @@ function successWorldNotification(reqId: string, body: WorldBody) {
       break;
     case "clone":
       title = `Cloned ${body.props.name}`;
+      description = `'${body.props.name}' has been cloned to '${resBody?.savedAs}'`;
       break;
     case "download":
       title = `Downloaded ${body.props.name}`;
@@ -75,6 +85,7 @@ function successWorldNotification(reqId: string, body: WorldBody) {
 
   notificationService.update({
     title,
+    description,
     id: reqId,
     status: "success",
     persistent: false,
