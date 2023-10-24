@@ -1,4 +1,4 @@
-import { Component, For, Setter, createSignal, onMount } from "solid-js";
+import { Component, For, Setter, Show, createSignal, onMount } from "solid-js";
 import { useMcContext } from "../context/mcContext";
 import BackupModal from "../components/saves/BackupModal";
 import { notificationService } from "@hope-ui/solid";
@@ -13,7 +13,10 @@ import createCachedSignal from "../utils/cachedSignal";
 
 const Saves: Component = () => {
   const [mcCtx, mutMcCtx] = useMcContext();
-  const saves = () => mcCtx.saves.filter((w) => !w.deleted);
+  const saves = () =>
+    mcCtx.saves.filter((w) => !w.deleted && w.name !== "world");
+  const hasActiveSave = () =>
+    mcCtx.saves.findIndex((w) => w.name === "world") > -1;
   const deletedSaves = () => mcCtx.saves.filter((w) => w.deleted);
   const [showDeleted, setShowDeleted] = createCachedSignal(
     false,
@@ -248,6 +251,26 @@ const Saves: Component = () => {
           <Toolbar />
         </form>
         <div class="p-2 bg-white rounded-md">
+          <p class="font-bold border-b border-gray-200">Active save</p>
+          <Show
+            when={hasActiveSave()}
+            fallback={
+              <p class="opacity-75 border-b border-gray-200 px-2">
+                There is no save loaded
+              </p>
+            }
+          >
+            <p
+              id={"save-entry-" + "world"}
+              class="border-b border-gray-200 px-2 cursor-pointer"
+              onClick={() => setSelectedSave("world")}
+            >
+              world
+            </p>
+          </Show>
+        </div>
+        <div class="p-2 bg-white rounded-md">
+          <p class="font-bold">Your saves</p>
           <table class="w-full table-auto">
             <thead class="border-b border-gray-200 text-sm">
               <tr class="text-left uppercase">
