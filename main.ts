@@ -49,6 +49,7 @@ async function main() {
   saves_manifest.init();
 
   fs_watcher.initJarsWatcher();
+  fs_watcher.initSavesWatcher();
 }
 
 main();
