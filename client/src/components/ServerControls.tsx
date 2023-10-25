@@ -15,7 +15,7 @@ const ServerControls: Component = () => {
     <>
       <div class="relative flex">
         <button
-          class="flex items-center rounded-md overflow-hidden h-6"
+          class="flex items-center rounded-md overflow-hidden h-6 focus:outline-none"
           onclick={handleClick}
         >
           <ServerStatus />
@@ -24,7 +24,9 @@ const ServerControls: Component = () => {
               <span
                 class="absolute -left-[9px] transition-transform duration-300"
                 style={{
-                  transform: dropped() ? "rotate(90deg) translate(2px)" : "none"
+                  transform: dropped()
+                    ? "rotate(90deg) translate(2px)"
+                    : "none",
                 }}
               >
                 {"▸"}
@@ -44,7 +46,7 @@ const Dropdown: Component = () => {
     <div
       class="absolute z-10 w-[120px] right-0 mt-8 bg-white text-gray-500 rounded-md p-1 flex flex-col transition-transform origin-top gap-1"
       style={{
-        transform: dropped() ? "rotateX(0deg)" : "rotateX(90deg)"
+        transform: dropped() ? "rotateX(0deg)" : "rotateX(90deg)",
       }}
     >
       <button

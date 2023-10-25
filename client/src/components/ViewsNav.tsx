@@ -32,7 +32,7 @@ const ViewLink: Component<{
 
   return (
     <button
-      class="w-full px-2 py-1 hover:bg-sky-100 hover:text-sky-600 transition-colors rounded-md text-start"
+      class="w-full px-2 py-1 hover:bg-sky-100 hover:text-sky-600 transition-colors focus:outline-none rounded text-start"
       style={{
         background: isCurrentLocation() ? "#0284C72f" : null,
         color: isCurrentLocation() ? "#0284C7" : null,

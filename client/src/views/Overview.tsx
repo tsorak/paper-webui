@@ -56,7 +56,7 @@ const Resizer: Component = () => {
 
   return (
     <div class="h-0" ref={resizeElem}>
-      <div class="flex items-center justify-center w-12 h-2 mx-auto bg-neutral-300 -translate-y-1/2 rounded-full transition-all hover:h-4 cursor-pointer select-none">
+      <div class="flex items-center justify-center w-12 h-2 mx-auto bg-white active:bg-neutral-100 -translate-y-1/2 rounded-full transition-all hover:h-4 cursor-pointer select-none">
         <span class="flex w-min -translate-y-[2px] scale-x-[2] text-neutral-500">
           ≡
         </span>
