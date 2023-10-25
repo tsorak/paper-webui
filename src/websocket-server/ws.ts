@@ -9,6 +9,9 @@ import { emitInstanceStatus } from "@/src/websocket-server/trigger/instance_stat
 import { emitInstanceStdout } from "@/src/websocket-server/trigger/instance_stdout.ts";
 import { emitInstancePlayers } from "@/src/websocket-server/trigger/instance_players.ts";
 import { emitJarsChange } from "@/src/websocket-server/trigger/jars_trigger.ts";
+import { emitSavesChange } from "@/src/websocket-server/trigger/saves_trigger.ts";
+import { saveDirState } from "@/src/fs-watcher/saves-watcher.ts";
+import { jarDirState } from "@/src/fs-watcher/jars-watcher.ts";
 
 export interface WS extends WebSocket {
   id: string;
@@ -37,9 +40,10 @@ function handleOpen(_e: WebSocketEventMap["open"], ws: WS) {
   ws.json(connectMessage);
 
   const { running, worldReady } = getCurrentInstance() ?? {};
-  emitInstanceStatus({ running, worldReady }, ws);
-
-  ws.json({ type: "instance_players", data: players.getAll() });
+  emit.instanceStatus({ running, worldReady });
+  emit.instanceJars({ initialState: Array.from(jarDirState.values()) });
+  emit.instanceSaves({ initialState: Array.from(saveDirState.values()) });
+  emit.instancePlayers(players.getAll());
 }
 
 function handleMessage(e: WebSocketEventMap["message"], ws: WS) {
@@ -71,4 +75,5 @@ export const emit = {
   instanceStdout: emitInstanceStdout,
   instancePlayers: emitInstancePlayers,
   instanceJars: emitJarsChange,
+  instanceSaves: emitSavesChange,
 };

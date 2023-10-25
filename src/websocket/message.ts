@@ -38,6 +38,10 @@ export type Message =
   | {
       type: "jars_change";
       data: JarsChangeData;
+    }
+  | {
+      type: "saves_change";
+      data: SavesChangeData;
     };
 
 export type PingData = { timestamp: string };
@@ -51,6 +55,9 @@ export type InstancePlayerData = string[];
 export type JarsChangeData =
   | { initialState: string[] }
   | { jarName: string; action: "add" | "delete" | "set" };
+export type SavesChangeData =
+  | { initialState: string[] }
+  | { savename: string; action: "add" | "delete" | "set" };
 
 function parse(message: string): Message | null {
   try {
