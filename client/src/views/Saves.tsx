@@ -330,8 +330,7 @@ const WorldRow: Component<{
 };
 
 const Toolbar: Component = () => {
-  const btnStyle =
-    "bg-sky-100 px-2 py-1 text-blue-400 rounded font-semibold cursor-pointer hover:bg-blue-200 hover:text-blue-500 transition-colors";
+  const btnStyle = "px-2 py-1 font-semibold primary-button";
 
   return (
     <div class="flex gap-2">

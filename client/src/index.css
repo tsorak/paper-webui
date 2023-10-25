@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .primary-button {
+    @apply transition-colors rounded cursor-pointer bg-primary-dimmed text-primary hover:bg-primary-dimmed-alt hover:text-primary-alt;
+  }
+}
