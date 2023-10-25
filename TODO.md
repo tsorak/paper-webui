@@ -21,7 +21,7 @@
     - Abort load/delete requests if instance is running
   - UI
     - [x] Table structure? [Name, Version]
-    - [ ] Separate table for deleted saves
+    - [x] Separate table for deleted saves
     - [x] Controls (Load, Clone, Delete, Download) static toolbar on top
     - [ ] Rename
     - [x] Load world
@@ -31,7 +31,7 @@
     - [x] Delete world
       - [x] Confirmation
     - Settings
-      - [ ] Option for disabling deletion prompt
+      - [x] Option for disabling deletion prompt
 - [ ] Datapacks management
   - Persist datapacks between saves option?
   - [ ] HTTP API
@@ -47,7 +47,7 @@
     - [ ] Update via fs-watcher
   - jar_manifest
     - [ ] cache jars state
-    - [ ] Update via fs-watcher
+    - [x] Update via fs-watcher
 
 ### WIP Refactor
 
