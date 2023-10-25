@@ -1,15 +1,32 @@
 import { createStore, unwrap, SetStoreFunction } from "solid-js/store";
 
-function openStore<T extends object>(cacheKey: string, fallback: T) {
+function openStore<T extends object>(params: {
+  cacheKey: string;
+  fallback: T;
+  desiredVersion: number;
+}) {
+  const { cacheKey, fallback, desiredVersion } = params;
+
   const cached: string | null = localStorage.getItem(
     `paper_webui_ctx_${cacheKey}`
   );
 
+  const toStore = {
+    ...fallback,
+    _v: desiredVersion,
+  };
+  const createInitial = () => createStore<T>(toStore);
+
   if (!cached) {
-    return createStore<T>(fallback);
+    return createInitial();
   }
 
-  return createStore<T>(JSON.parse(cached));
+  const parsed = JSON.parse(cached);
+  if (parsed?._v !== desiredVersion) {
+    return createInitial();
+  }
+
+  return createStore<T>(parsed);
 }
 
 function cacheStore<T>(
