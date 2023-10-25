@@ -10,8 +10,11 @@ import CloneModal from "../components/saves/CloneModal";
 import DeleteConfirmationModal from "../components/saves/DeleteConfirmation";
 import DeletedSavesTable from "../components/saves/DeletedSavesTable";
 import createCachedSignal from "../utils/cachedSignal";
+import SavesSettings from "../components/saves/SavesSettings";
+import { useSiteSettingsContext } from "../context/siteSettingsContext";
 
 const Saves: Component = () => {
+  const [siteSettings, _] = useSiteSettingsContext();
   const [mcCtx, mutMcCtx] = useMcContext();
   const saves = () =>
     mcCtx.saves.filter((w) => !w.deleted && w.name !== "world");
@@ -128,7 +131,7 @@ const Saves: Component = () => {
     }
 
     // Have user confirm deletion
-    if (body.kind === "delete") {
+    if (siteSettings.prompt.delete && body.kind === "delete") {
       setDeleteConfModalOpen(true);
       try {
         console.log("Waiting for user selection...");
@@ -244,12 +247,15 @@ const Saves: Component = () => {
         promiseControls={deleteConfDone}
       />
       <main class="flex flex-col gap-2">
-        <form
-          class="p-2 bg-white rounded-md self-start"
-          onSubmit={handleSubmit}
-        >
-          <Toolbar />
-        </form>
+        <div class="flex justify-between">
+          <form
+            class="p-2 bg-white rounded-md self-start"
+            onSubmit={handleSubmit}
+          >
+            <Toolbar />
+          </form>
+          <SavesSettings />
+        </div>
         <div class="p-2 bg-white rounded-md">
           <p class="font-bold border-b border-gray-200">Active save</p>
           <Show
