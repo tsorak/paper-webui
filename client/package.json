@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@hope-ui/solid": "^0.6.7",
+    "@solid-primitives/scheduled": "^1.4.1",
     "@stitches/core": "^1.2.8",
     "lucide-solid": "^0.288.0",
     "solid-js": "^1.6.10",

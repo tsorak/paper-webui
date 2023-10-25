@@ -1,11 +1,14 @@
-import { Component, createSignal, onMount } from "solid-js";
+import { Component, Setter, createSignal, onMount } from "solid-js";
+import { debounce } from "@solid-primitives/scheduled";
 import Log from "../components/Log";
 import Command from "../components/Command";
 import Players from "../components/Players";
-
-const [h, setH] = createSignal(0);
+import { useSiteSettingsContext } from "../context/siteSettingsContext";
 
 const Overview: Component = () => {
+  const [siteSettings, _] = useSiteSettingsContext();
+  const [h, setH] = createSignal(siteSettings.views.overview.upperHeight);
+
   return (
     <main class="flex flex-col gap-2 flex-grow backdrop:opacity-10 break-all">
       <div class="flex flex-col h-full gap-2">
@@ -17,7 +20,7 @@ const Overview: Component = () => {
           <div class="basis-1/2" />
           {/* <OsResourceStats /> */}
         </div>
-        <Resizer />
+        <Resizer setHUI={setH} />
         <div class="flex-grow flex flex-col gap-2">
           <Log />
           <Command />
@@ -27,9 +30,20 @@ const Overview: Component = () => {
   );
 };
 
-const Resizer: Component = () => {
+const Resizer: Component<{ setHUI: Setter<number> }> = (props) => {
   const [holding, setHolding] = createSignal(false);
   let resizeElem: HTMLDivElement | undefined;
+
+  const [_, mutSiteSettings] = useSiteSettingsContext();
+
+  const updateCached = debounce((height: number) => {
+    mutSiteSettings.views.overview.upperHeight(height);
+  }, 200);
+
+  function setH(v: number) {
+    props.setHUI(v);
+    updateCached(v);
+  }
 
   onMount(() => {
     const upper = document.querySelector(".upper") as HTMLDivElement;

@@ -5,11 +5,25 @@ interface SiteSettingsState {
   prompt: {
     delete: boolean;
   };
+  views: {
+    overview: {
+      upperHeight: number;
+    };
+  };
 }
 
-const store = openStore<SiteSettingsState>("site_settings", {
-  prompt: {
-    delete: true,
+const store = openStore<SiteSettingsState>({
+  cacheKey: "site_settings",
+  desiredVersion: 2,
+  fallback: {
+    prompt: {
+      delete: true,
+    },
+    views: {
+      overview: {
+        upperHeight: 128,
+      },
+    },
   },
 });
 const [storeGetter, storeSetter] = store;
@@ -20,6 +34,14 @@ const mut = {
     delete: () => {
       storeSetter("prompt", "delete", (p) => !p);
       updateCache();
+    },
+  },
+  views: {
+    overview: {
+      upperHeight: (height: number) => {
+        storeSetter("views", "overview", "upperHeight", height);
+        updateCache();
+      },
     },
   },
 };
