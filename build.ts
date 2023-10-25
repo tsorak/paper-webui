@@ -1,7 +1,7 @@
 import { resolve, toFileUrl } from "path/mod.ts";
 import { exists } from "fs/mod.ts";
 
-import { debugCommandOutput } from "@/src/utils/process.ts";
+import { logStdoutStderrPair } from "@/src/utils/process.ts";
 
 async function build() {
   //   const cleanedLatestLog = cleanLatestLog();
@@ -27,7 +27,6 @@ async function prepareClient() {
   const install = await installClientDependencies();
   if (!install.success) {
     console.log("Failed to install client dependencies.");
-    debugCommandOutput(install);
     return install;
   }
   console.log("Installed client dependencies.");
@@ -35,7 +34,6 @@ async function prepareClient() {
   const build = await buildClient();
   if (!build.success) {
     console.log("Failed to build client.");
-    debugCommandOutput(build);
     return build;
   }
   console.log("Client built successfully.");
@@ -44,25 +42,31 @@ async function prepareClient() {
 }
 
 async function installClientDependencies() {
-  const npmProcess = new Deno.Command("npm", {
+  const spawned = new Deno.Command("npm", {
     args: ["install"],
     cwd: resolve(Deno.cwd(), "client"),
     stdout: "piped",
     stderr: "piped",
-  }).output();
+  }).spawn();
 
-  return await npmProcess;
+  const { stdout, stderr } = spawned;
+  logStdoutStderrPair({ stdout, stderr });
+
+  return await spawned.status;
 }
 
 async function buildClient() {
-  const npmProcess = new Deno.Command("npm", {
+  const spawned = new Deno.Command("npm", {
     args: ["run", "build"],
     cwd: resolve(Deno.cwd(), "client"),
     stdout: "piped",
     stderr: "piped",
-  }).output();
+  }).spawn();
 
-  return await npmProcess;
+  const { stdout, stderr } = spawned;
+  logStdoutStderrPair({ stdout, stderr });
+
+  return await spawned.status;
 }
 
 async function getFaultyDirs() {

@@ -12,6 +12,7 @@
     "jsonfile/": "https://deno.land/x/jsonfile@1.0.0/",
     "path/": "https://deno.land/std@0.198.0/path/",
     "fs/": "https://deno.land/std@0.198.0/fs/",
-    "zod/": "https://deno.land/x/zod@v3.22.2/"
+    "zod/": "https://deno.land/x/zod@v3.22.2/",
+    "std_streams/": "https://deno.land/std@0.204.0/streams/"
   }
 }
