@@ -16,7 +16,7 @@ async function writeManifest(data: SaveEntry[]) {
   );
 }
 
-interface SaveEntry {
+export interface SaveEntry {
   name: string;
   jar?: string;
   deleted?: boolean;
