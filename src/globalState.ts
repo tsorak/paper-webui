@@ -3,6 +3,7 @@ import { mapEntries } from "std_collections/mod.ts";
 
 import type { SaveEntry } from "@/src/types.ts";
 import SubscriptionMap from "@/src/utils/SubscriptionMap.ts";
+import { hasActiveWorld } from "@/src/subprocess/world_manager.ts";
 
 type SavesStateInterface = Awaited<ReturnType<typeof buildSavesStateInterface>>;
 let savesState: SavesStateInterface;
@@ -18,8 +19,9 @@ function initSavesState() {
   }
 
   savesStateRaw = new SubscriptionMap<string, SaveEntry>();
+  savesState = buildSavesStateInterface(savesStateRaw);
 
-  buildSavesStateInterface(savesStateRaw);
+  initCurrentWorldState();
 
   return savesState;
 }
@@ -93,9 +95,15 @@ function buildSavesStateInterface(state: SubscriptionMap<string, SaveEntry>) {
     },
   };
 
-  savesState = stateInterface;
-
   return stateInterface;
+}
+
+function initCurrentWorldState() {
+  savesState.subscribe("reset", async () => {
+    if (!(await hasActiveWorld())) return;
+
+    savesState.set("world", { name: "world" });
+  });
 }
 
 init();

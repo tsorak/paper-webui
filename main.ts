@@ -46,6 +46,7 @@ async function main() {
 
   saves_manifest.init();
   fs_watcher.initSavesWatcher();
+  fs_watcher.initWorldWatcher();
 
   jar_manager.init();
   fs_watcher.initJarsWatcher();
