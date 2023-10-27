@@ -1,4 +1,4 @@
-import { Component, For, Setter, Show, createSignal, onMount } from "solid-js";
+import { Component, For, Setter, Show, createSignal } from "solid-js";
 import { useMcContext } from "../context/mcContext";
 import BackupModal from "../components/saves/BackupModal";
 import { notificationService } from "@hope-ui/solid";
@@ -14,8 +14,8 @@ import SavesSettings from "../components/saves/SavesSettings";
 import { useSiteSettingsContext } from "../context/siteSettingsContext";
 
 const Saves: Component = () => {
-  const [siteSettings, _] = useSiteSettingsContext();
-  const [mcCtx, mutMcCtx] = useMcContext();
+  const [siteSettings] = useSiteSettingsContext();
+  const [mcCtx] = useMcContext();
   const saves = () =>
     mcCtx.saves.filter((w) => !w.deleted && w.name !== "world");
   const hasActiveSave = () =>
@@ -25,14 +25,6 @@ const Saves: Component = () => {
     false,
     "showDeleted"
   );
-
-  const ensureLatestSaves = async () => {
-    mutMcCtx("saves", (await fetchSaves()).saves);
-  };
-
-  onMount(async () => {
-    ensureLatestSaves();
-  });
 
   const [shutdownOptionOpen, setShutdownOptionOpen] = createSignal(false);
   const [shutdownOptionDone, resetShutdownOptionDone] = createPromiseSignal();
@@ -221,7 +213,6 @@ const Saves: Component = () => {
       unselectSave();
       setCloneName("");
     }
-    ensureLatestSaves();
   }
 
   return (

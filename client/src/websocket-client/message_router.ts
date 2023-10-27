@@ -8,6 +8,7 @@ import handleInstanceStatus from "./handlers/handleInstanceStatus";
 import handleInstanceStdout from "./handlers/handleInstanceStdout";
 import handleInstancePlayers from "./handlers/handleInstancePlayers";
 import handleJarsChange from "./handlers/handleJarsChange";
+import handleSavesChange from "./handlers/handleSavesChange";
 
 export default function route(message: Message, ws: CS) {
   if (message.type !== "pong") {
@@ -30,5 +31,7 @@ export default function route(message: Message, ws: CS) {
       return handleInstancePlayers(message, ws);
     case "jars_change":
       return handleJarsChange(message, ws);
+    case "saves_change":
+      return handleSavesChange(message, ws);
   }
 }
