@@ -42,14 +42,17 @@ let getCurrentInstance: () =>
 async function main() {
   await build();
 
+  await import("@/src/globalState.ts");
+
+  saves_manifest.init();
+  fs_watcher.initSavesWatcher();
+
+  jar_manager.init();
+  fs_watcher.initJarsWatcher();
+
   readStdin();
   getCurrentInstance = runner();
   initHttp();
-  jar_manager.init();
-  saves_manifest.init();
-
-  fs_watcher.initJarsWatcher();
-  fs_watcher.initSavesWatcher();
 }
 
 main();

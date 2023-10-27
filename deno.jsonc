@@ -13,6 +13,8 @@
     "path/": "https://deno.land/std@0.198.0/path/",
     "fs/": "https://deno.land/std@0.198.0/fs/",
     "zod/": "https://deno.land/x/zod@v3.22.2/",
-    "std_streams/": "https://deno.land/std@0.204.0/streams/"
+    "std_streams/": "https://deno.land/std@0.204.0/streams/",
+    "std_assert/": "https://deno.land/std@0.204.0/assert/",
+    "std_collections/": "https://deno.land/std@0.204.0/collections/"
   }
 }
