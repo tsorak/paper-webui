@@ -11,7 +11,7 @@ import * as ws from "@/src/websocket-server/ws.ts";
 import * as players from "@/src/subprocess/players.ts";
 import { getCurrentInstance } from "@/main.ts";
 import * as world_manager from "@/src/subprocess/world_manager.ts";
-import * as saves_manifest from "@/src/subprocess/saves_manifest.ts";
+import { savesState } from "@/src/globalState.ts";
 import {
   createDateFilename,
   ensureZipExtension,
@@ -92,22 +92,14 @@ export default function setupPatterns(p: ReturnType<typeof initMc>) {
 
       if (saveResult.success) {
         mc.sendCMD(`say Saved world as ${savename}`);
-        saves_manifest.reindex();
       } else {
         mc.sendCMD(`say Failed to save world. Reason: ${saveResult.reason}`);
       }
     });
   });
 
-  setPlayerCommand("reindex", async () => {
-    const _ = await saves_manifest.reindex();
-
-    mc.sendCMD("say Reindexed saves.");
-  });
-
-  setPlayerCommand("listsaves", async (data) => {
-    await saves_manifest.reindex();
-    const saves = await saves_manifest.getAll();
+  setPlayerCommand("listsaves", (data) => {
+    const saves = savesState.getAll();
 
     const verbose = ["all", "verbose"].includes(
       data.command!.args[0]?.toLowerCase() ?? ""
@@ -127,7 +119,6 @@ export default function setupPatterns(p: ReturnType<typeof initMc>) {
   });
 
   setPlayerCommand(["loadsave", "load"], async (data) => {
-    await saves_manifest.reindex();
     const [saveNameRaw, replaceCurrentRaw] = data.command!.args;
 
     if (!saveNameRaw) {
@@ -147,7 +138,7 @@ export default function setupPatterns(p: ReturnType<typeof initMc>) {
       "-f",
     ].includes(replaceCurrentRaw?.toLowerCase() ?? "");
 
-    if (!(await saves_manifest.has(saveName))) {
+    if (!savesState.has(saveName)) {
       mc.sendCMD(`say Save '${saveName}' not found.`);
       return;
     }
@@ -167,7 +158,9 @@ export default function setupPatterns(p: ReturnType<typeof initMc>) {
     const instance = getCurrentInstance();
     const _stopped = await instance!.childProcess.status;
 
-    const loadStatus = await world_manager.loadWorld(saveName, replaceCurrent);
+    const loadStatus = await world_manager.loadWorld(saveName, {
+      replaceCurrent,
+    });
     if (!loadStatus.success) return;
 
     rnr.push("start");

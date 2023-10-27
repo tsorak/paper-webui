@@ -1,6 +1,6 @@
 import { clients } from "@/src/websocket-server/clients.ts";
 import type { SavesChangeData } from "@/src/websocket/message.ts";
-import { saveDirState } from "@/src/fs-watcher/saves-watcher.ts";
+import { savesState } from "@/src/globalState.ts";
 
 export function emitSavesChange(data: SavesChangeData) {
   clients.forEach((client) => {
@@ -11,10 +11,14 @@ export function emitSavesChange(data: SavesChangeData) {
   });
 }
 
-saveDirState.subscribe("add", (savename) => {
-  emitSavesChange({ savename, action: "add" });
+savesState.subscribe("set", (save) => {
+  emitSavesChange({ save, action: "set" });
 });
 
-saveDirState.subscribe("delete", (savename) => {
-  emitSavesChange({ savename, action: "delete" });
+savesState.subscribe("delete", (save) => {
+  emitSavesChange({ save, action: "delete" });
+});
+
+savesState.subscribe("reset", (initialState) => {
+  emitSavesChange({ initialState });
 });

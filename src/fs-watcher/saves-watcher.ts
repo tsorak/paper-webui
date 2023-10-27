@@ -1,9 +1,8 @@
 import { startWatching } from "@/src/fs-watcher.ts";
 import { exists } from "fs/mod.ts";
 import { resolve } from "path/resolve.ts";
-import { default as SubscriptionSet } from "@/src/utils/SubscriptionSet.ts";
-
-const dirState: SubscriptionSet<string> = new SubscriptionSet();
+import { savesState as dirState } from "@/src/globalState.ts";
+import { SaveEntry } from "@/src/types.ts";
 
 function init() {
   const savesWatcher = Deno.watchFs(resolve(Deno.cwd(), "saves"));
@@ -51,11 +50,15 @@ function toName(paths: string[]): string[] | undefined {
 }
 
 function handleCreation(name: string) {
-  dirState.add(name);
+  const save = dirState.get(name);
+  if (save && !save.deleted) return;
+
+  const blankEntry: SaveEntry = { name };
+  dirState.set(name, blankEntry);
 }
 
 function handleDeletion(name: string) {
-  dirState.delete(name);
+  dirState.update(name, { deleted: true });
 }
 
-export { init, dirState as saveDirState };
+export { init };

@@ -1,6 +1,6 @@
 import * as zip from "@/src/utils/zip.ts";
 import * as mc_version from "@/src/subprocess/mc_version.ts";
-import * as saves_manifest from "@/src/subprocess/saves_manifest.ts";
+import { savesState } from "@/src/globalState.ts";
 import { resolve } from "path/resolve.ts";
 import { exists } from "fs/exists.ts";
 import { debugCommandOutput } from "@/src/utils/process.ts";
@@ -8,14 +8,6 @@ import { ensureZipExtension } from "@/src/utils/savename.ts";
 
 // This module should not do any validation
 // Use world_helper instead as it does validation
-
-async function getSaves(): Promise<{ name: string; version: string }[]> {
-  const saves: { name: string; jar?: string }[] = [];
-  //   for await (const save of Deno.readDir("./saves")) {
-  //     save.name;
-  //   }
-  //TODO: read saves manifest
-}
 
 async function saveCurrent(
   savename: string
@@ -36,8 +28,8 @@ async function saveCurrent(
     return { success: false, reason: "Compress process failed." };
   }
 
-  const currentJar = await mc_version.getActiveVersion();
-  await saves_manifest.add({ name: savename, jar: currentJar });
+  const jar = await mc_version.getActiveVersion();
+  savesState.set(savename, { name: savename, jar });
 
   return { success: true, savedAs: savename };
 }
@@ -74,9 +66,9 @@ async function deleteWorld(
     };
   }
 
-  const deleteResult = await saves_manifest.update(savename, { deleted: true });
+  savesState.update(savename, { deleted: true });
 
-  return { success: deleteResult };
+  return { success: true };
 }
 
 // async function hasCurrentBeenSaved(): Promise<boolean> {}
@@ -115,7 +107,7 @@ async function cloneWorld(
 ): Promise<{ success: true } | { success: false; reason: string }> {
   if (saveName === "world") return { success: false, reason: "Invalid name." };
 
-  const saveExists = await saves_manifest.get(saveName);
+  const saveExists = savesState.get(saveName);
   if (!saveExists) return { success: false, reason: "Save does not exist." };
 
   try {
@@ -128,13 +120,13 @@ async function cloneWorld(
     return { success: false, reason: "Clone process failed." };
   }
 
-  await saves_manifest.add({ name: to, jar: saveExists.jar });
+  const { jar } = saveExists;
+  savesState.set(to, { name: to, jar });
 
   return { success: true };
 }
 
 export {
-  getSaves,
   saveCurrent,
   deleteCurrent,
   hasActiveWorld,

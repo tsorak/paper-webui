@@ -1,3 +1,5 @@
+import { SaveEntry } from "@/src/types.ts";
+
 export type Message =
   | {
       type: "error";
@@ -56,8 +58,8 @@ export type JarsChangeData =
   | { initialState: string[] }
   | { jarName: string; action: "add" | "delete" | "set" };
 export type SavesChangeData =
-  | { initialState: string[] }
-  | { savename: string; action: "add" | "delete" | "set" };
+  | { initialState: [string, SaveEntry][] }
+  | { save: [string, SaveEntry]; action: "delete" | "set" };
 
 function parse(message: string): Message | null {
   try {
