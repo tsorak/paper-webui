@@ -1,6 +1,4 @@
 defmodule InstanceManager.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   use Application
@@ -8,13 +6,22 @@ defmodule InstanceManager.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: InstanceManager.Worker.start_link(arg)
-      # {InstanceManager.Worker, arg}
+      {InstanceManager.Manager, []}
     ]
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: InstanceManager.Supervisor]
-    Supervisor.start_link(children, opts)
+    {:ok, super_pid} = Supervisor.start_link(children, opts)
+
+    #
+    instance_dir =
+      System.fetch_env!("PAPER_INSTANCES_DIR")
+      |> (&if(&1 |> String.starts_with?("/"),
+            do: &1,
+            else: throw("Env PAPER_INSTANCES_DIR must be an absolute path.")
+          )).()
+
+    InstanceManager.Manager.setup_existing_instances(instance_dir: instance_dir)
+
+    {:ok, super_pid}
   end
 end
